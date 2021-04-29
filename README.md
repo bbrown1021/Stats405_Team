@@ -10,7 +10,8 @@
 ### Stuff to Add
 
 - do we need to add a section going further into answering the question? not just a list of frequencies
-- maybe a pretty graph, like histogram
+  - maybe a pretty graph, like histogram
+  - or more summary statistics
 
 ### Stuff to Discuss
 
