@@ -118,14 +118,31 @@ xx <- dbGetQuery(con, qstr)
 # then filter to only show players that scored more than 3 goals
 
 
+
+
+
 qstr <-
 paste0(
-"SELECT * FROM nhl_gameDate_1  ",
-"JOIN nhl_playersDate_1 ON (nhl_gameDate_1.date=nhl_playersDate_1.date AND nhl_gameDate_1.VT=nhl_playersDate_1.team)  ",
-" OR (nhl_gameDate_1.date=nhl_playersDate_1.date AND nhl_gameDate_1.HT=nhl_playersDate_1.team)  ",
-"WHERE nhl_playersDate_1.goals > ", xpntsCO
+"
+SELECT game.date
+		, players.firstName
+        , players.lastName
+        , players.timeOnIce
+        , players.goals
+        , CASE WHEN players.team = 'Montréal Canadiens' THEN 'Montreal Canadiens'
+			else players.team end as team
+		, CASE WHEN game.VT = 'Montréal Canadiens' THEN 'Montreal Canadiens'
+			else game.VT end as VT
+		, CASE WHEN game.HT = 'Montréal Canadiens' THEN 'Montreal Canadiens'
+			else game.HT end as HT
+		, game.officials
+FROM nhl_gameDate_1 game
+JOIN nhl_playersDate_1 players ON (game.date = players.date AND game.VT = players.team) 
+						OR (game.date = players.date AND game.HT = players.team)
+WHERE players.goals > ", xpntsCO
 )
 qstr
+
 
 # output query
 df_out <- dbGetQuery(con, qstr)
