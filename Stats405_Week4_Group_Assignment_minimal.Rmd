@@ -1,7 +1,7 @@
 ---
 title: "Officials in NHL Games with Prolific Player Scoring"
 subtitle: "MAS Stats 405 Spring 2021 Week 4 Assignment"
-author: "Britney Brown, Harrison DiStefano, Lisa Kaunitz, Tianyang Liu, Jeremy Weidner"
+author: "Britney Brown, Harrison DiStefano, Greg Eastman, Lisa Kaunitz, Tianyang Liu, Jeremy Weidner"
 date: "05/02/2021"
 output:
   pdf_document: default
