@@ -105,14 +105,19 @@ We will be using two tables from the given database: "nhl_gameDate_1" and "nhl_p
 The first table provides information such as the game date, the visiting and home teams, and the names of the officials. The second table provides infromation on a player's first and last name, the team they played for, and the total goals scored in a game. By joining these two tables together and filtering for players that scored more than `r xpntsCO` goals, we will be able to provide an answer to the above question of interest. 
 
 ```{r runQuery1, echo=FALSE, eval=TRUE, results='hide'}
-qstr <- "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='nhl_gameDate_1'"
+qstr <- "SELECT COLUMN_NAME 
+         FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_NAME='nhl_gameDate_1'"
 xx <- dbGetQuery(con, qstr)
 #xx
 
-qstr <- "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='nhl_playersDate_1'"
+qstr <- "SELECT COLUMN_NAME 
+         FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_NAME='nhl_playersDate_1'"
 xx <- dbGetQuery(con, qstr)
 #xx
 
+####### process also described in Method section above #######
 # select game table (contains info on game date, visiting and home teams, and officials)
 # join with players table (contains info on a player's goals) where the dates match and:
 ## 1. the game's visiting team matches the players' team OR
@@ -121,27 +126,40 @@ xx <- dbGetQuery(con, qstr)
 #### (the names of officials for each game and the number of goals each player made)
 # then filter to only show players that scored more than 3 goals
 
-
 qstr <-
 paste0(
-"SELECT * FROM nhl_gameDate_1  ",
-"JOIN nhl_playersDate_1 ON (nhl_gameDate_1.date=nhl_playersDate_1.date AND nhl_gameDate_1.VT=nhl_playersDate_1.team)  ",
-" OR (nhl_gameDate_1.date=nhl_playersDate_1.date AND nhl_gameDate_1.HT=nhl_playersDate_1.team)  ",
-"WHERE nhl_playersDate_1.goals > ", xpntsCO
+"
+SELECT game.date
+		, players.firstName
+        , players.lastName
+        , players.timeOnIce
+        , players.goals
+        , CASE WHEN players.team = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else players.team end as team
+		, CASE WHEN game.VT = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else game.VT end as VT
+		, CASE WHEN game.HT = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else game.HT end as HT
+		, game.officials
+FROM nhl_gameDate_1 game
+JOIN nhl_playersDate_1 players ON (game.date = players.date AND game.VT = players.team) 
+						OR (game.date = players.date AND game.HT = players.team)
+WHERE players.goals > ", xpntsCO
 )
 qstr
 
 # output query
-df_out <- dbGetQuery(con, qstr)
+df_out_sub <- dbGetQuery(con, qstr)
 
-class(df_out) # data frame
+class(df_out_sub) # data.frame
 
-colnames(df_out) # note that there are non-unique column names
-colnames(df_out) <- make.names(names=colnames(df_out), unique = TRUE) # make all column names unique
-
-
-# subset only the variables of interest
-df_out_sub <- df_out[ , c("date", "firstName", "lastName", "timeOnIce", "goals", "team", "VT", "HT", "officials")]
+######## previous code when using SELECT * rather than selecting just the columns of interest ########
+# colnames(df_out) # note that there are non-unique column names
+# colnames(df_out) <- make.names(names=colnames(df_out), unique = TRUE) # make all column names unique
+# 
+# 
+# # subset only the variables of interest
+# df_out_sub <- df_out[ , c("date", "firstName", "lastName", "timeOnIce", "goals", "team", "VT", "HT", "officials")]
 
 Date <- df_out_sub[, 1]
 # strip the time into readable format

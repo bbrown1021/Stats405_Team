@@ -5,9 +5,6 @@
 ### Stuff to Fix
 
 - background image, make opaque on first page
-- gsub to fix Montreal Canadians team name
-  - code from lecture might be helpful:
-  - gsub("\xe9", "e", df_out[ , "VT" ])
 
 
 ### Stuff to Add
