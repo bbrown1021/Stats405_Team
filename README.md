@@ -1,8 +1,8 @@
-# Stats405_Team
+# Stats 405 Team Project
 
-# WEEK 4 ASSIGNMENT
+## WEEK 4 ASSIGNMENT
 
-## Stuff to Fix
+### Stuff to Fix
 
 - background image, make opaque on first page
 - gsub to fix Montreal Canadians team name
@@ -10,12 +10,12 @@
   - gsub("\xe9", "e", df_out[ , "VT" ])
 
 
-## Stuff to Add
+### Stuff to Add
 
 - do we need to add a section going further into answering the question? not just a list of frequencies
 - maybe a pretty graph, like histogram
 
-## Stuff to Discuss
+### Stuff to Discuss
 
 - use xtable or ktable?
   - currently using ktable due to compilation issues
