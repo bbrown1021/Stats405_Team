@@ -7,23 +7,8 @@ output:
   pdf_document: default
 ---
 
----
-output:
-  pdf_document: default
-    includes:
-      in_header: "preamble.tex"
-    toc: yes
-    toc_depth: '3'
-    geometry: left=10mm, right=10mm, top=25mm, bottom=25mm
-  html_document:
-    theme: paper
-    toc: yes
-    toc_depth: 3
-    toc_float: yes
----
-
-
-```{r SET UP, echo=FALSE, message=FALSE, eval=TRUE, results='hide'}
+<style type="text/css">.main-container {  max-width: 2800px;  margin-left: auto;  margin-right: auto;}</style>
+```{r SET UP, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warning=FALSE}
 
 # load libraries 
 library(RMySQL)
@@ -61,7 +46,7 @@ xbool_tableExists # if all TRUE, success!
 ```
 
 
-```{r runQueryDate, echo=FALSE, eval=TRUE, results='hide'}
+```{r runQueryDate, echo=FALSE, eval=TRUE, results='hide', warning=FALSE}
 
 ##### get min and max date
 
@@ -94,13 +79,11 @@ xpntsCO <- 3 # number of goals of interest
 
 Utilizing regular season NHL game and player data spanning from `r xminDD` to `r xmaxDD`, we produce the frequencies of officials in games where a player scored `r xpntsCO + 1` or more goals.
 
-# Method
+# Methodology
 
-We will be using two tables from the given database: "nhl_gameDate_1" and "nhl_playersDate_1"
+To answer the achieve the above result we use two objects from the given database: "nhl_gameDate_1" and "nhl_playersDate_1". The first database object provides information on game date, visiting teams, home teams, and the names of the officials. The second provides information on a player's first name, last name, the team, and total goals scored in a game. By joining these two database objects together, and filtering for players that scored more than `r xpntsCO` goals, we provide an answer to the above question of interest. 
 
-The first table provides information such as the game date, the visiting and home teams, and the names of the officials. The second table provides infromation on a player's first and last name, the team they played for, and the total goals scored in a game. By joining these two tables together and filtering for players that scored more than `r xpntsCO` goals, we will be able to provide an answer to the above question of interest. 
-
-```{r runQuery1, echo=FALSE, eval=TRUE, results='hide'}
+```{r runQuery1, echo=FALSE, eval=TRUE, results='hide', warning=FALSE}
 qstr <- "SELECT COLUMN_NAME 
          FROM INFORMATION_SCHEMA.COLUMNS 
          WHERE TABLE_NAME='nhl_gameDate_1'"
@@ -170,16 +153,16 @@ nHSgames <- nrow(df_out_sub) # 53 games
 # Results
 
 ## Table 1
-
-The first table describes the basic game information associated with all games in our data where a player scored more than `r xpntsCO` goals. This table includes the date of the game, the player's first and last name, team name, as well as their time on ice and total goals scored. On the right-hand side of the table, there is also information regarding visitng and home teams alongside the list of officials for that game. 
+The first table describes the basic information associated with all games in our data where a player scored more than `r xpntsCO` goals. This table includes the date of the game, the player's first and last name, team name, as well as their time on ice and total goals scored. On the right-hand side of the table, there is also information regarding visitng and home teams alongside the list of officials for that game. 
 
 ## Table 2
 
-The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be rare occurance since most officials have 2 or less occurances officiating games with prolific player scoring. 
+The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring. 
+
 
 \newpage
 
-```{r runQuery1result, echo=FALSE, eval=TRUE, results='asis', table.width=20}
+```{r runQuery1result, echo=FALSE, eval=TRUE, results='asis', table.width=20, warning=FALSE}
 
 library(kableExtra)
 
@@ -235,7 +218,7 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
 
 \newpage
 
-```{r runOfficials, echo=FALSE, eval=TRUE, results='show'}
+```{r runOfficials, echo=FALSE, eval=TRUE, results='show', warning=FALSE}
 
 # unlist the column of officials (list of 4 people) by the semicolon and use gsub to separate  out their names
 xofficials <- gsub("^\\s*|\\s*$", "", (unlist(strsplit(df_out_sub[ , "officials"], ";"))))
@@ -248,7 +231,7 @@ xoff_df <- xoff_df[ order(xoff_df[ , "Freq"], decreasing=TRUE), ]
 ```
 
 
-```{r runTableOfficials, echo=FALSE, eval=TRUE, results='asis'}
+```{r runTableOfficials, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
 
 
 if( opts_knit$get("rmarkdown.pandoc.to") %in% "html" ) {
