@@ -81,7 +81,7 @@ Utilizing regular season NHL game and player data spanning from `r xminDD` to `r
 
 # Methodology
 
-To answer the achieve the above result we use two objects from the given database: "nhl_gameDate_1" and "nhl_playersDate_1". The first database object provides information on game date, visiting teams, home teams, and the names of the officials. The second provides information on a player's first name, last name, the team, and total goals scored in a game. By joining these two database objects together, and filtering for players that scored more than `r xpntsCO` goals, we provide an answer to the above question of interest. 
+To answer and achieve the above result we use two objects from the given database: "nhl_gameDate_1" and "nhl_playersDate_1". The first database object provides information on game date, visiting teams, home teams, and the names of the officials. The second provides information on a player's first name, last name, the team, and total goals scored in a game. By joining these two database objects together, and filtering for players that scored more than `r xpntsCO` goals, we provide an answer to the above question of interest. 
 
 ```{r runQuery1, echo=FALSE, eval=TRUE, results='hide', warning=FALSE}
 qstr <- "SELECT COLUMN_NAME 
@@ -157,7 +157,7 @@ The first table describes the basic information associated with all games in our
 
 ## Table 2
 
-The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring. 
+The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be a rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring. 
 
 
 \newpage
