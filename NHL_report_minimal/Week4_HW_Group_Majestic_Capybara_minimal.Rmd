@@ -1,32 +1,17 @@
 ---
 title: "Officials in NHL Games with Prolific Player Scoring"
-subtitle: "MAS Stats 405 Spring 2021 Week 4 Assignment"
-author: 
-- Britney Brown, Harrison DiStefano, Greg Eastman
-- Lisa Kaunitz, Tianyang Liu, Jeremy Weidner
-date: "05/02/2021"
-geometry: 'left=12mm, right=12mm, top=10mm, bottom=15mm'
-fontsize: 12pt
+author: Britney Brown, Harrison DiStefano, Greg Eastman, Lisa Kaunitz, Tianyang Liu,
+  Jeremy Weidner
+date: "05/07/2021"
 output:
-  pdf_document:
-    latex_engine: xelatex
-    keep_tex:  true
-    toc: no
-    toc_depth: '3'
-header-includes:
- \usepackage{background}
- \usepackage{float}
- \backgroundsetup{
- scale=1,
- color=black,
- angle=0,
- pages=all,
- contents={\includegraphics[width=16.5cm,height=40cm]{nhl_action_02.png}}
- }
- 
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: MAS Stats 405 Spring 2021 Week 4 Assignment
 ---
 
 <style type="text/css">.main-container {  max-width: 2800px;  margin-left: auto;  margin-right: auto;}</style>
+
 ```{r SET UP, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warning=FALSE}
 
 # load libraries 
@@ -187,16 +172,10 @@ df_SK; df_MM
 
 # Results
 
-## Table 1
+## Table 1 - High Scoring Players
 The first table describes the basic information associated with all games in our data where a player scored more than `r xpntsCO` goals. This table includes the date of the game, the player's first and last name, team name, as well as their time on ice and total goals scored. On the right-hand side of the table, there is also information regarding visitng and home teams alongside the list of officials for that game. 
 
-## Table 2
 
-The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be a rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring.
-
-## Table 3
-
-The third tables show the highest scoring players in the games that had the top two officials. Both tables show the date of the game, highest scoring players first and last names, visiting and home teams, as well as the number of goals scored. Almost all players scored a total of four goals with the exception of Patrik Laine, who scored five while Kozari officiated. 
 
 
 \newpage
@@ -271,6 +250,11 @@ xoff_df <- as.data.frame(table(xofficials))
 xoff_df <- xoff_df[ order(xoff_df[ , "Freq"], decreasing=TRUE), ]
 ```
 
+## Table 2 - Game Officials
+
+The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be a rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring.
+
+\vspace{12pt}
 
 ```{r runTableOfficials, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
 
@@ -278,6 +262,7 @@ xoff_df <- xoff_df[ order(xoff_df[ , "Freq"], decreasing=TRUE), ]
 if( opts_knit$get("rmarkdown.pandoc.to") %in% "html" ) {
   
   nuoffs <- nrow(xoff_df)
+  rownames(xoff_df) <- NULL # remove row names for table
   
   #kable( xoff_df, format="html", table.attr = "id=\"resultsOfficials1\""  )
   xxtb <- kable( xoff_df, format="html", table.attr = "style='width:40% ;'"  )
@@ -329,9 +314,28 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   # 
   
 }
+```
 
+<!-- \input{output_2.tex} -->
 
-### doesnt work 
+\newpage
+
+## Table 3 and 4 - Top Officials: Matt MacPherson and Steve Kozari
+
+As seen in table 2, two officials, Matt MacPherson and Steve Kozari, each officiated six games where players scored more than 3 goals. The following two tables show the first and last names of these six highest scoring players with their respective officials. Both tables also include information on the date of the game, visiting and home teams, as well as the number of goals scored. Almost all players scored a total of four goals with the exception of Patrik Laine, who scored five while Kozari officiated. 
+
+\vspace{12pt}
+
+```{r, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
+# SUMMARY STATS ON MATT MACPHERSON & STEVE KOZARI
+# Highest scoring Players in the games which Matt MacPherson officiated.
+xmatt <- which(grepl('Matt MacPherson', df_out_sub[ , 'officials']))
+df_MM <- df_out_sub[ xmatt, c('date', 'firstName', 'lastName', 'VT', 'HT', 'goals') ]
+
+# Highest scoring Players in the games which Steve Kozari officiated.
+xsteve <- which(grepl('Steve Kozari', df_out_sub[ , 'officials']))
+df_SK <- df_out_sub[ xsteve, c('date', 'firstName', 'lastName', 'VT', 'HT', 'goals') ]
+
 # kable - MM
 if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
   xxtb <- kable( df_MM, format='html', table.attr = "style='width:40% ;'"  )
@@ -339,30 +343,29 @@ if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
   #kable_styling(xxtb)
 }
 if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
-  ###### “{ }\\” -- try to create some vertical space
-  xcaption3 <- paste0("Highest scoring Players in the games which Matt MacPherson officiated.")
-  x.big <- suppressWarnings(xtable(df_MM))
-  caption(x.big) <-  xcaption3
-  ## xx <- suppressWarnings(print(x.big, tabular.environment=‘longtable’, include.rownames=FALSE, print.results=FALSE))
-  xx <-
-    suppressWarnings(
-      print(
-        x.big,
-        size='\\fontsize{10pt}{10pt}\\selectfont',
-        tabular.environment='tabular',
-        include.rownames=FALSE,
-        print.results=FALSE
-        )
-      )
-  yy <- strsplit(xx, "\n")[[1]]
-  yy <- c(yy[1], "\\tiny", yy[2:length(yy)])
-  # yy <- xx
-  writeLines(yy, "output_3.tex")
+  ###### "{ }\\" -- try to create some vertical space
+  xcaption3 <- paste0("Highest Scoring Players in Games Officiated by Matt MacPherson.")
+  rownames(df_MM) <- NULL
+  
+  xxMM <- kable(df_MM, format="latex", caption = xcaption3, booktabs = TRUE, longtable = TRUE)
+
+  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 
+
+# kable - SK
+if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
+  xxtb <- kable( df_SK, format='html', table.attr = "style='width:40% ;'"  )
+  xxtb
+  #kable_styling(xxtb)
+}
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
+  ###### "{ }\\" -- try to create some vertical space
+  xcaption4 <- paste0("Highest Scoring Players in Games Officiated by Steve Kozari.")
+  rownames(df_SK) <- NULL
+  
+  xxSK <- kable(df_SK, format="latex", caption = xcaption4, booktabs = TRUE, longtable = TRUE)
+
+  kable_styling(xxSK, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+}
 ```
-
-<!-- \input{output_2.tex} -->
-
-
-
