@@ -1,0 +1,368 @@
+---
+title: "Officials in NHL Games with Prolific Player Scoring"
+subtitle: "MAS Stats 405 Spring 2021 Week 4 Assignment"
+author: 
+- Britney Brown, Harrison DiStefano, Greg Eastman
+- Lisa Kaunitz, Tianyang Liu, Jeremy Weidner
+date: "05/02/2021"
+geometry: 'left=12mm, right=12mm, top=10mm, bottom=15mm'
+fontsize: 12pt
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex:  true
+    toc: no
+    toc_depth: '3'
+header-includes:
+ \usepackage{background}
+ \usepackage{float}
+ \backgroundsetup{
+ scale=1,
+ color=black,
+ angle=0,
+ pages=all,
+ contents={\includegraphics[width=16.5cm,height=40cm]{nhl_action_02.png}}
+ }
+ 
+---
+
+<style type="text/css">.main-container {  max-width: 2800px;  margin-left: auto;  margin-right: auto;}</style>
+```{r SET UP, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warning=FALSE}
+
+# load libraries 
+library(RMySQL)
+library(knitr)
+library(xtable)
+
+options(xtable.comment = FALSE) #### prevents commenting when printing xtable latex
+
+projpath <- getwd() # set working directory as project path
+
+if(!exists("xdbsock")) {
+    xdbsock <- ""
+    cat("\n", 
+        "Parameter 'xdbsock' not found, setting to empty string for general usage", 
+        "\n")
+}
+
+drv <- dbDriver("MySQL") # create driver object
+
+# connect to professor's database
+xdbuser <- Sys.getenv("MAS405_AWS_DZES_DB_RO_USER")
+xpw     <- Sys.getenv("MAS405_AWS_DZES_DB_RO_PW")
+xdbname <- Sys.getenv("MAS405_AWS_DZES_DB_RO_DBNAME")
+xdbhost <- Sys.getenv("MAS405_AWS_DZES_DB_RO_HOST")
+xdbport <- as.integer( Sys.getenv("MAS405_AWS_DZES_DB_RO_PORT") )
+
+con <- dbConnect(drv, unix.sock=xdbsock,
+                 user=xdbuser, password=xpw, dbname=xdbname, host=xdbhost, port=xdbport)
+
+# check that all NHL tables of interest exist in database connection
+xbool_tableExists <- dbExistsTable(con, 
+                    c("nhl_gameDate_1","nhl_goaliesDate_1",
+                      "nhl_playersDate_1","nhl_teamDate_1"))
+xbool_tableExists # if all TRUE, success!
+```
+
+
+```{r runQueryDate, echo=FALSE, eval=TRUE, results='hide', warning=FALSE}
+
+##### get min and max date
+
+qstr <- "SELECT MIN(date), MAX(date) FROM nhl_playersDate_1"
+
+xx <- dbGetQuery(con, qstr)
+xx
+
+xMinDataDate <- xx[1, 1]
+xMaxDataDate <- xx[1, 2]
+
+xminDD <- format( strptime(xMinDataDate, "%Y%m%d"), "%m-%d-%Y")
+xmaxDD <- format( strptime(xMaxDataDate, "%Y%m%d"), "%m-%d-%Y")
+
+xpntsCO <- 3 # number of goals of interest
+```
+
+<style type="text/css">
+#resultsT1 {
+  width: 140% ;
+}
+#resultsOfficials1 {
+  width: 50% ;
+}
+</style>
+
+# Introduction
+
+**In the NHL, are some officials more likely than others to have officiated a game with a prolific individual player performance?**
+
+Utilizing regular season NHL game and player data spanning from `r xminDD` to `r xmaxDD`, we produce the frequencies of officials in games where a player scored `r xpntsCO + 1` or more goals.
+
+# Methodology
+
+To answer and achieve the above result we use two objects from the given database: "nhl_gameDate_1" and "nhl_playersDate_1". The first database object provides information on game date, visiting teams, home teams, and the names of the officials. The second provides information on a player's first name, last name, the team, and total goals scored in a game. By joining these two database objects together, and filtering for players that scored more than `r xpntsCO` goals, we provide an answer to the above question of interest. 
+
+```{r runQuery1, echo=FALSE, eval=TRUE, results='hide', warning=FALSE}
+qstr <- "SELECT COLUMN_NAME 
+         FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_NAME='nhl_gameDate_1'"
+xx <- dbGetQuery(con, qstr)
+#xx
+
+qstr <- "SELECT COLUMN_NAME 
+         FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_NAME='nhl_playersDate_1'"
+xx <- dbGetQuery(con, qstr)
+#xx
+
+####### process also described in Method section above #######
+# select game table (contains info on game date, visiting and home teams, and officials)
+# join with players table (contains info on a player's goals) where the dates match and:
+## 1. the game's visiting team matches the players' team OR
+## 2. the game's home team matches the player's team
+#### this results in a joined table with information needed to answer the question 
+#### (the names of officials for each game and the number of goals each player made)
+# then filter to only show players that scored more than 3 goals
+
+qstr <-
+paste0(
+"
+SELECT game.date
+		, players.firstName
+        , players.lastName
+        , players.timeOnIce
+        , players.goals
+        , CASE WHEN players.team = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else players.team end as team
+		, CASE WHEN game.VT = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else game.VT end as VT
+		, CASE WHEN game.HT = 'Montr\xe9al Canadiens' THEN 'Montreal Canadiens'
+			else game.HT end as HT
+		, game.officials
+FROM nhl_gameDate_1 game
+JOIN nhl_playersDate_1 players ON (game.date = players.date AND game.VT = players.team) 
+						OR (game.date = players.date AND game.HT = players.team)
+WHERE players.goals > ", xpntsCO
+)
+qstr
+
+# output query
+df_out_sub <- dbGetQuery(con, qstr)
+
+class(df_out_sub) # data.frame
+
+######## previous code when using SELECT * rather than selecting just the columns of interest ########
+# colnames(df_out) # note that there are non-unique column names
+# colnames(df_out) <- make.names(names=colnames(df_out), unique = TRUE) # make all column names unique
+# 
+# 
+# # subset only the variables of interest
+# df_out_sub <- df_out[ , c("date", "firstName", "lastName", "timeOnIce", "goals", "team", "VT", "HT", "officials")]
+
+Date <- df_out_sub[, 1]
+# strip the time into readable format
+DateFormat <- format( strptime(Date, "%Y%m%d"), "%m-%d-%Y")
+df_out_sub[, 1] <- DateFormat
+
+nHSgames <- nrow(df_out_sub) # 53 games
+
+###################################################
+# SUMMARY STATS ON MATT MACPHERSON & STEVE KOZARI #
+###################################################
+
+# Highest scoring Players in the games which Matt MacPherson officiated.
+xmatt <- which(grepl('Matt MacPherson', df_out_sub[ , 'officials']))
+df_MM <- df_out_sub[ xmatt, c('date', 'firstName', 'lastName', 'VT', 'HT', 'goals') ]
+df_MM
+
+# Highest scoring Players in the games which Steve Kozari officiated.
+xsteve <- which(grepl('Steve Kozari', df_out_sub[ , 'officials']))
+df_SK <- df_out_sub[ xsteve, c('date', 'firstName', 'lastName', 'VT', 'HT', 'goals') ]
+df_SK; df_MM
+
+
+```
+
+
+
+# Results
+
+## Table 1
+The first table describes the basic information associated with all games in our data where a player scored more than `r xpntsCO` goals. This table includes the date of the game, the player's first and last name, team name, as well as their time on ice and total goals scored. On the right-hand side of the table, there is also information regarding visitng and home teams alongside the list of officials for that game. 
+
+## Table 2
+
+The second table shows the frequency of officials who officiated games where a player scored more than 3 goals. In this table we see that officials Matt MacPherson, Steve Kozari, Brad Meier, Dan Schachte, David Brisebois, Mark Wheler, and Tim Peel all officiated 5 or 6 games where at least one player was capable of scoring more than 3 goals in a single game. This seems to be a rare occurrence since most officials have 2 or less occurrences officiating games with prolific player scoring.
+
+## Table 3
+
+The third tables show the highest scoring players in the games that had the top two officials. Both tables show the date of the game, highest scoring players first and last names, visiting and home teams, as well as the number of goals scored. Almost all players scored a total of four goals with the exception of Patrik Laine, who scored five while Kozari officiated. 
+
+
+\newpage
+
+```{r runQuery1result, echo=FALSE, eval=TRUE, results='asis', table.width=20, warning=FALSE}
+
+library(kableExtra)
+
+### kable(df_out_sub, format="html", table.attr = "style='width:40% ;'")
+
+##### we can use opts_knit$get("rmarkdown.pandoc.to") to determine whether we'd 
+##### rather use kable or xtable to render a table 
+
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "html" ) {
+  kable(df_out_sub, format="html", table.attr = "style='width:100% ;'")
+}
+
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
+  
+  xcaption <- "NHL games where a Player Scored More than 3 Goals."
+  
+
+  xxtb <- kable(df_out_sub, format="latex", caption=xcaption)
+  suppressWarnings(kable_styling(xxtb, latex_options=c("scale_down", "HOLD_position", "striped") ))
+  
+
+  #x.big <- suppressWarnings(xtable(df_out_sub, label='tabbig'))
+
+  #caption(x.big) <- xcaption
+
+  ## xx <- suppressWarnings(print(x.big, tabular.environment='longtable', include.rownames=FALSE, print.results=FALSE))
+
+  # xx <- 
+  #   suppressWarnings(
+  #   print(
+  #     x.big, 
+  #     tabular.environment='tabular', 
+  #     include.rownames=FALSE, 
+  #     print.results=FALSE
+  #     )
+  #   )
+  
+  #print(x.big, tabular.environment='longtable',
+  #      floating=FALSE,include.rownames=FALSE, 
+  #      hline.after = c(-1,nrow(x.big)),
+  #      add.to.row = list(pos = list(0),
+  #      command = "\\hline \\endhead "), file = "output.tex")
+  # yy <- strsplit(xx, "\n")[[1]]
+  # 
+  # yy <- c(yy[1], "\\tiny", yy[2:length(yy)])
+  # 
+  # writeLines(yy, "output.tex")
+  
+}
+
+
+```
+
+<!-- \input{output.tex} -->
+
+\newpage
+
+```{r runOfficials, echo=FALSE, eval=TRUE, results='show', warning=FALSE}
+
+# unlist the column of officials (list of 4 people) by the semicolon and use gsub to separate  out their names
+xofficials <- gsub("^\\s*|\\s*$", "", (unlist(strsplit(df_out_sub[ , "officials"], ";"))))
+
+# create a frequency table of officials
+xoff_df <- as.data.frame(table(xofficials))
+
+# reorder by decreasing frequency
+xoff_df <- xoff_df[ order(xoff_df[ , "Freq"], decreasing=TRUE), ]
+```
+
+
+```{r runTableOfficials, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
+
+
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "html" ) {
+  
+  nuoffs <- nrow(xoff_df)
+  
+  #kable( xoff_df, format="html", table.attr = "id=\"resultsOfficials1\""  )
+  xxtb <- kable( xoff_df, format="html", table.attr = "style='width:40% ;'"  )
+  xxtb
+  #kable_styling(xxtb)
+}
+
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
+
+  nuoffs <- nrow(xoff_df) # 90 occurances
+  
+  rownames(xoff_df) <- NULL # remove row names for table
+  colnames(xoff_df) <- c("official", "number of games") # rename columns
+  
+  ###### "{ }\\" -- creates some vertical space (removed since we have a page break)
+  xcaption2 <- paste0("Frequency of Officials who Officiated Games where a Player Scored more than ", xpntsCO, " Goals (See Table 1)")
+  
+  xxtb <- kable(xoff_df, format="latex", caption = xcaption2, booktabs = TRUE, longtable = TRUE)
+
+  kable_styling(xxtb, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+
+
+  # 
+  # x.big <- suppressWarnings(xtable(xoff_df))
+  # 
+  # caption(x.big) <-  xcaption2
+  # 
+  # ## xx <- suppressWarnings(print(x.big, tabular.environment='longtable', include.rownames=FALSE, print.results=FALSE))
+  # 
+  # xx <- 
+  #   suppressWarnings(
+  #     print(
+  #       x.big, 
+  #       size='\\fontsize{7pt}{7pt}\\selectfont',
+  #       tabular.environment='longtable', 
+  #       include.rownames=FALSE, 
+  #       print.results=FALSE
+  #       )
+  #     )
+  # 
+  # 
+  # #yy <- strsplit(xx, "\n")[[1]]
+  # 
+  # #yy <- c(yy[1], "\\tiny", yy[2:length(yy)])
+  # yy <- xx
+  # 
+  # writeLines(yy, "output_2.tex")
+  # 
+  # 
+  
+}
+
+
+### doesnt work 
+# kable - MM
+if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
+  xxtb <- kable( df_MM, format='html', table.attr = "style='width:40% ;'"  )
+  xxtb
+  #kable_styling(xxtb)
+}
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
+  ###### “{ }\\” -- try to create some vertical space
+  xcaption3 <- paste0("Highest scoring Players in the games which Matt MacPherson officiated.")
+  x.big <- suppressWarnings(xtable(df_MM))
+  caption(x.big) <-  xcaption3
+  ## xx <- suppressWarnings(print(x.big, tabular.environment=‘longtable’, include.rownames=FALSE, print.results=FALSE))
+  xx <-
+    suppressWarnings(
+      print(
+        x.big,
+        size='\\fontsize{10pt}{10pt}\\selectfont',
+        tabular.environment='tabular',
+        include.rownames=FALSE,
+        print.results=FALSE
+        )
+      )
+  yy <- strsplit(xx, "\n")[[1]]
+  yy <- c(yy[1], "\\tiny", yy[2:length(yy)])
+  # yy <- xx
+  writeLines(yy, "output_3.tex")
+}
+
+```
+
+<!-- \input{output_2.tex} -->
+
+
+
