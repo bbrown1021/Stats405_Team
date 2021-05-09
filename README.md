@@ -2,6 +2,5 @@
 
 ## WEEK 4 ASSIGNMENT
 
-- done?
-- no submission yet
+- submitted
 
