@@ -36,8 +36,7 @@ group by time_signature
 order by count_tracks desc
 LIMIT 100
  
- -- some pretty weird stuff  going on in the time_signature field. Most common is 4/4 as expected.
- 
+
 
  ;
  
@@ -54,11 +53,7 @@ LIMIT 100
 	group by artist, decade
 	order by count_songs desc) x
 WHERE rn <= 10
-	AND decade like '%s%' -- this is to remove strange values from decade field
 order by decade, rn
-
-
--- seems like there's some bad data in the decade field as well.
 
 
 ;

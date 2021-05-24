@@ -133,9 +133,9 @@ dbGetQuery(con, qstr)
 
 qstr <-
 paste0(
-"LOAD DATA LOCAL INFILE 'C:/Users/theje/Desktop/UCLA/405/JeremyProject/wm_project.csv' ",
+"LOAD DATA LOCAL INFILE 'C:/Users/theje/Desktop/UCLA/405/JeremyProject/wm_project.txt' ",
 " INTO TABLE ", xtableName,
-" FIELDS TERMINATED BY ',' ",
+" FIELDS TERMINATED BY '\t' ",
 " LINES TERMINATED BY '\n' ",
 " IGNORE 1 ROWS"
 )
