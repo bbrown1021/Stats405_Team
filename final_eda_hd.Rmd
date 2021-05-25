@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Final project EDA"
 author: "Harrison DiStefano"
 output:
   pdf_document: default
@@ -116,9 +116,46 @@ ggplot(data = result4, aes(x = key, group = mode, fill = mode, stat = "count")) 
 ```
 Spotify assigned most songs to a major key which makes sense because most songs are written in major keys.
 
-C, D, and G#/Ab (probably Ab, G# is awkward) major are the most commonly found keys. Generally keys with less accidentals (#/b) keys are more popular--the two most popular keys C major and D major have 0 and 2 respectively.
+C, D, and G#/Ab (probably Ab, G# is awkward) major are the most commonly found keys. Generally keys with less accidentals (#/b) keys are more popular--two of the most popular keys, C major and D major, have 0 and 2 respectively.
 
 Around 2800 tracks are of unknown key, or about 7% of the database. 
+
+```{r warning=FALSE}
+query5 <- "
+SELECT 
+  decade
+  , danceability
+  , liveness
+  , duration_ms / 60000 AS duration -- Convert to minutes
+FROM music
+
+;
+"
+
+query6 <- "
+SELECT 
+  decade
+  , AVG(duration_ms / 60000) AS avg_duration -- Convert to minutes
+  , STD(duration_ms / 60000) AS sd_duration
+FROM music
+GROUP BY decade
+
+;
+"
+
+result5 <- dbGetQuery(con, query5)
+result6 <- dbGetQuery(con, query6)
+
+ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
+  geom_point(position = position_jitter(w = 0.2)) +
+  #geom_errorbar(aes(ymax = duration, ymin = duration)) + 
+  geom_errorbar(data = result6, mapping = aes(x = decade, y = avg_duration,
+                  ymin = avg_duration - sd_duration,
+                  ymax = avg_duration + sd_duration
+                  ),
+                color = 'black', width = 0.2) + 
+  labs(title = "Track Duration by Decade")
+```
 
 
 ```{r}
