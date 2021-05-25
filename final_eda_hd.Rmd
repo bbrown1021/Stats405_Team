@@ -1,0 +1,36 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Final Project EDA 
+
+```{r}
+# Libraries
+install.packages("RMariaDB")
+library(RMariaDB)
+library(DBI)
+```
+
+```{r}
+# Connect to database
+db_host <- Sys.getenv("DB_READ_ENDPOINT")
+db_user <- Sys.getenv("DB_READ_USER")
+db_pw   <- Sys.getenv("DB_READ_PASSWORD")
+db_port <- Sys.getenv("DB_READ_PORT")
+db_name <- Sys.getenv("DB_READ_DB")
+db_drv  <- RMariaDB::MariaDB()
+
+con <- dbConnect(db_drv, user=db_user, password=db_pw, dbname=db_name, host=db_host, port=db_port)
+
+dbListTables(con)
+```
+```{r}
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
