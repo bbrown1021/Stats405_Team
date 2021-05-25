@@ -1,5 +1,6 @@
 ---
 title: "R Notebook"
+author: "Harrison DiStefano"
 output: html_notebook
 ---
 
@@ -77,6 +78,43 @@ result3
 Listening to these tracks, most have very little actual vocalization but are generally noisy. It's possible Spotify's algorithm is mistaking some of the cacophonous sounds as voices.
 
 
+```{r}
+query4 <- "
+SELECT CASE WHEN song_key = 0 THEN 'C'
+            WHEN song_key = 1 THEN 'C#/Db'
+            WHEN song_key = 2 THEN 'D'
+            WHEN song_key = 3 THEN 'D#/Eb'
+            WHEN song_key = 4 THEN 'E'
+            WHEN song_key = 5 THEN 'F'
+            WHEN song_key = 5 THEN 'F#/Gb'
+            WHEN song_key = 6 THEN 'G'
+            WHEN song_key = 7 THEN 'G#/Ab'
+            WHEN song_key = 8 THEN 'A'
+            WHEN song_key = 9 THEN 'A#/Bb'
+            WHEN song_key = 10 THEN 'B'
+            ELSE 'Unknown Key'
+       END,
+       CASE WHEN song_mode = 0 THEN 'minor'
+            WHEN song_mode = 1 THEN 'major'
+            ELSE 'Unknown Mode'
+       END
+FROM music
+                     
+;
+"
+
+result4 <- dbGetQuery(con, query4)
+names(result4) <- c("key", "mode")
+
+ggplot(data = result4, aes(x = key, group = mode, fill = mode, stat = "count")) +
+  geom_bar(position = "dodge") +
+  labs(title = "Frequency of Keys Assigned by Spotify")
+```
+Spotify assigned most songs to a major key which makes sense because most songs are written in major keys.
+
+C, D, and G#/Ab (probably Ab, G# is awkward) major are the most commonly found keys. Generally keys with less accidentals (#/b) keys are more popular--the two most popular keys C major and D major have 0 and 2 respectively.
+
+Around 2800 tracks are of unknown key, or about 7% of the database. 
 
 
 ```{r}
