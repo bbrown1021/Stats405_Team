@@ -40,7 +40,6 @@ result1 <- dbGetQuery(con, query1)
 result1
 ```
 ```{r}
-# Look at relationship between mode, energy, and danceability
 query2 <- "
 SELECT speechiness, instrumentalness, energy
 FROM music
@@ -55,11 +54,29 @@ result2 <- dbGetQuery(con, query2)
 ggplot(data = result2, mapping = aes(x = speechiness, y = instrumentalness, col = energy)) +
   geom_point(size = 1)
 ```
-Most of the tracks displaying a high degree of speechiness have 0 instrumentalness, probably indicating audio books, podcasts, spoken word, etc. 
+Most of the tracks displaying a high degree of speechiness have 0 instrumentalness, probably indicating they are audio books, podcasts, spoken word, etc. 
 
-There are a few outliers that have both high speechiness and instrumentalness which is interesting because from the variable descriptions these seem mutually exclusive.
+There are a few outliers that have both high speechiness and instrumentalness (> 0.5 for both) which is interesting because from the variable descriptions these seem mutually exclusive.
 
 More energetic tracks clustered more around the extremes of instrumental and spechiness?
+
+Let's take a closer look at the outliers:
+```{r}
+query3 <- "
+SELECT artist, track, speechiness, instrumentalness
+FROM music
+WHERE speechiness > 0.5 AND instrumentalness > 0.5
+ORDER BY speechiness DESC
+
+;
+"
+
+result3 <- dbGetQuery(con, query3)
+result3
+```
+Listening to these tracks, most have very little actual vocalization but are generally noisy. It's possible Spotify's algorithm is mistaking some of the cacophonous sounds as voices.
+
+
 
 
 ```{r}
