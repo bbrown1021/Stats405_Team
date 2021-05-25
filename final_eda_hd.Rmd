@@ -10,6 +10,7 @@ output: html_notebook
 install.packages("RMariaDB")
 library(RMariaDB)
 library(DBI)
+library(ggplot2)
 ```
 
 ```{r}
@@ -26,11 +27,42 @@ con <- dbConnect(db_drv, user=db_user, password=db_pw, dbname=db_name, host=db_h
 dbListTables(con)
 ```
 ```{r}
+# Take a look at the first few rows
+query1 <- "
+SELECT * 
+FROM music
+LIMIT 10
 
+;
+"
+
+result1 <- dbGetQuery(con, query1)
+result1
+```
+```{r}
+# Look at relationship between mode, energy, and danceability
+query2 <- "
+SELECT speechiness, instrumentalness, energy
+FROM music
+
+;
+"
+
+result2 <- dbGetQuery(con, query2)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+ggplot(data = result2, mapping = aes(x = speechiness, y = instrumentalness, col = energy)) +
+  geom_point(size = 1)
+```
+Most of the tracks displaying a high degree of speechiness have 0 instrumentalness, probably indicating audio books, podcasts, spoken word, etc. 
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+There are a few outliers that have both high speechiness and instrumentalness which is interesting because from the variable descriptions these seem mutually exclusive.
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+More energetic tracks clustered more around the extremes of instrumental and spechiness?
+
+
+```{r}
+# Disconnect from database to clean up connection
+dbDisconnect(con)
+```
