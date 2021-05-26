@@ -148,12 +148,12 @@ result6 <- dbGetQuery(con, query6)
 
 ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
   geom_point(position = position_jitter(w = 0.2)) +
-  #geom_errorbar(aes(ymax = duration, ymin = duration)) + 
   geom_errorbar(data = result6, mapping = aes(x = decade, y = avg_duration,
                   ymin = avg_duration - sd_duration,
                   ymax = avg_duration + sd_duration
                   ),
                 color = 'black', width = 0.2) + 
+  geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   labs(title = "Track Duration by Decade")
 ```
 
