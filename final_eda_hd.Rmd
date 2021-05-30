@@ -11,12 +11,21 @@ output:
 # Final Project EDA 
 
 ```{r}
+# Knitr options
+knitr::opts_chunk$set(warning = FALSE)  # Suppress warnings when knitting
+```
+
+```{r}
 # Libraries
 #install.packages("RMariaDB")
 library(RMariaDB)
 library(DBI)
 library(ggplot2)
 library(dplyr)
+library(reshape2)
+
+# Constants
+DECADE_ORDER <- c("60s\r", "70s\r", "80s\r", "90s\r", "00s\r", "10s\r")
 ```
 
 ```{r}
@@ -154,7 +163,8 @@ GROUP BY
 result5 <- dbGetQuery(con, query5)
 result6 <- dbGetQuery(con, query6)
 
-ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
+ggplot(data = result5, 
+       aes(x = factor(decade, level = DECADE_ORDER), y = duration, color = decade)) +
   geom_point(position = position_jitter(w = 0.2)) +
   geom_errorbar(data = result6, mapping = aes(x = decade, y = avg_duration,
                   ymin = avg_duration - sd_duration,
@@ -162,7 +172,8 @@ ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
                   ),
                 color = 'black', width = 0.2) + 
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
-  labs(title = "Duration of Hit Tracks by Decade")
+  labs(title = "Duration of Hit Tracks by Decade") +
+  xlab("Decade")
 ```
 ```{r}
 mode_query <- "
@@ -207,7 +218,36 @@ ggplot(data = mode_proportions_by_decade,
                     values = c("#619CFF", "#F8766D"))
 ```
 ```{r}
+overview_query <- "
+SELECT
+  decade
+  , danceability
+  , energy
+  , speechiness
+  , acousticness
+  , valence
+FROM
+  music
+WHERE
+  hit = '1'
+"
 
+overview_result <- dbGetQuery(con, overview_query)
+
+avg_traits_by_decade <- overview_result %>%
+  group_by(decade) %>%
+  summarize_all("mean") %>%
+  melt(id = "decade")
+
+ggplot(data = avg_traits_by_decade, 
+       aes(x = factor(decade, level = DECADE_ORDER), 
+           y = value, color = variable)
+       ) +
+  geom_line(aes(group = variable), size = 1) +
+  geom_point() +
+  labs(title = "Traits of Hit Tracks by Decade") +
+  xlab("Decade") +
+  ylab("Value")
 ```
 
 
