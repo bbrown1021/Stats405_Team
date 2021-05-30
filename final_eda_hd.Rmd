@@ -16,6 +16,7 @@ output:
 library(RMariaDB)
 library(DBI)
 library(ggplot2)
+library(dplyr)
 ```
 
 ```{r}
@@ -156,7 +157,45 @@ ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   labs(title = "Track Duration by Decade")
 ```
+```{r}
+mode_query <- "
+SELECT 
+  CASE 
+    WHEN decade = '60s\r' THEN '1960'
+    WHEN decade = '70s\r' THEN '1970'
+    WHEN decade = '80s\r' THEN '1980'
+    WHEN decade = '90s\r' THEN '1990'
+    WHEN decade = '00s\r' THEN '2000'
+    WHEN decade = '10s\r' THEN '2010'
+    ELSE 'Unknown Decade'
+  END
+  , song_mode
+FROM 
+  music
+;
+"
 
+mode_result <- dbGetQuery(con, mode_query)
+names(mode_result) <- c('decade', 'song_mode')
+
+# Calculate proportions of each mode by decade
+mode_proportions_by_decade <- mode_result %>%
+  group_by(decade, song_mode) %>%
+  summarize(n = n()) %>%
+  mutate(mode_percent = n / sum(n) * 100)
+
+
+ggplot(data = mode_proportions_by_decade, 
+       aes(x = as.numeric(decade), y = mode_percent, fill = factor(song_mode))
+       ) +
+  geom_bar(stat = "identity") +
+  labs(title = "Major/Minor Usage by Decade") +
+  xlab("Decade") + 
+  ylab("Percent") +
+  scale_fill_manual(name = "Mode", # Legend options
+                    labels = c("Minor", "Major"), 
+                    values = c("#619CFF", "#F8766D"))
+```
 
 ```{r}
 # Disconnect from database to clean up connection
