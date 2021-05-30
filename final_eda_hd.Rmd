@@ -128,7 +128,10 @@ SELECT
   , danceability
   , liveness
   , duration_ms / 60000 AS duration -- Convert to minutes
-FROM music
+FROM
+  music
+WHERE
+  hit = '1'
 
 ;
 "
@@ -138,8 +141,12 @@ SELECT
   decade
   , AVG(duration_ms / 60000) AS avg_duration -- Convert to minutes
   , STD(duration_ms / 60000) AS sd_duration
-FROM music
-GROUP BY decade
+FROM 
+  music
+WHERE 
+  hit = '1'
+GROUP BY 
+  decade
 
 ;
 "
@@ -155,7 +162,7 @@ ggplot(data = result5, aes(x = decade, y = duration, color = decade)) +
                   ),
                 color = 'black', width = 0.2) + 
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
-  labs(title = "Track Duration by Decade")
+  labs(title = "Duration of Hit Tracks by Decade")
 ```
 ```{r}
 mode_query <- "
@@ -172,6 +179,9 @@ SELECT
   , song_mode
 FROM 
   music
+WHERE
+  hit = '1'
+  
 ;
 "
 
@@ -189,13 +199,17 @@ ggplot(data = mode_proportions_by_decade,
        aes(x = as.numeric(decade), y = mode_percent, fill = factor(song_mode))
        ) +
   geom_bar(stat = "identity") +
-  labs(title = "Major/Minor Usage by Decade") +
+  labs(title = "Major/Minor Usage of Hit Tracks by Decade") +
   xlab("Decade") + 
   ylab("Percent") +
   scale_fill_manual(name = "Mode", # Legend options
                     labels = c("Minor", "Major"), 
                     values = c("#619CFF", "#F8766D"))
 ```
+```{r}
+
+```
+
 
 ```{r}
 # Disconnect from database to clean up connection
