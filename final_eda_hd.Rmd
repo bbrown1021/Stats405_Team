@@ -174,7 +174,7 @@ ggplot(data = result5,
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   labs(title = "Duration of Hit Tracks by Decade") +
   xlab("Decade") +
-  ylab("Duration") +
+  ylab("Duration (minutes)") +
   theme(legend.position = "none")
 
 ggsave("Duration_By_Decade.png", device = "png", path = "plots")
