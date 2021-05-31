@@ -173,7 +173,11 @@ ggplot(data = result5,
                 color = 'black', width = 0.2) + 
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   labs(title = "Duration of Hit Tracks by Decade") +
-  xlab("Decade")
+  xlab("Decade") +
+  ylab("Duration") +
+  theme(legend.position = "none")
+
+ggsave("Duration_By_Decade.png", device = "png", path = "plots")
 ```
 ```{r}
 mode_query <- "
@@ -216,6 +220,8 @@ ggplot(data = mode_proportions_by_decade,
   scale_fill_manual(name = "Mode", # Legend options
                     labels = c("Minor", "Major"), 
                     values = c("#619CFF", "#F8766D"))
+
+ggsave("Mode_By_Decade.png", device = "png", path = "plots")
 ```
 ```{r}
 overview_query <- "
@@ -247,7 +253,11 @@ ggplot(data = avg_traits_by_decade,
   geom_point() +
   labs(title = "Traits of Hit Tracks by Decade") +
   xlab("Decade") +
-  ylab("Value")
+  ylab("Value") +
+  scale_y_continuous(limits = c(0, 1.0)) +
+  theme(legend.title = element_blank())
+
+ggsave("Traits_By_Decade.png", device = "png", path = "plots")
 ```
 
 
