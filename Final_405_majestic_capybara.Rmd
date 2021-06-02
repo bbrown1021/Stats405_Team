@@ -83,9 +83,7 @@ Write something
 
 # Introduction
 
-REWRITE TO DESCRIBE QUESTION OF INTEREST
-
-We analyze a database of Spotify tracks that have had attributes assigned to them algorithmically by Spotify. These attributes act as descriptors for each track and allow us to group similar tracks and identify potentially interesting information and trends in the data. We have used this to analyze the songs in the Spotify database for what we found to be the most interesting questions. In the following sections we will cover the data more in depth, describe our methodology for exploring the data, and present our final analyses.
+Everywhere we go, we are followed by melodies and catchy tunes that get stuck in our heads. But have you ever stopped to wonder why we love certain songs and have to turn the radio off on others? In this article, we will do just that by analyzing a Spotify database containing various musical attributes such as tempo, danceability, energy, and acousticness to get to the bottom of what truly makes a song popular. We will also examine if these features change over time, which would suggest a shift in musical preference as the entertainment industry, music, instruments, and we as a society evolve. 
 
 \vspace{12pt}
 
@@ -440,11 +438,11 @@ ggpubr::ggarrange(c1, c2,c3,c4)
 
 \newpage 
 
-## Attributes by Decade
+## Attributes of Hit Tracks by Decade
 
 TEXT TEXT TEXT
 
-### Duration of Hit Tracks 
+### Duration of Song
 
 The duration of hit tracks is genrally under 10 minutes with an average closer to 4 minutes across the decades. One notable exception is in the 1970s, possibly due to the popularity of Progressive Rock during those years with the blending of Rock and Jazz Fusion into long, drawn-out concept albums and longer-winded tracks.
 
@@ -500,7 +498,7 @@ ggsave("Duration_By_Decade.png", device = "png", path = "plots")
 ```
           
 
-### Proportion of Major/Minor Hit Tracks
+### Proportion of Major/Minor Modes
 
 The proportion of hit songs in the minor mode has increased from about 15% in the 1960s to almost 30% in the 2010s. The minor mode is associated with sadness, while the major has a happier sound. This signifies a potential trend that people have developed a taste for more depressing, saddening popular music over the last couple of decades.
 
@@ -553,7 +551,7 @@ ggsave("Mode_By_Decade.png", device = "png", path = "plots")
 
 \newpage
 
-### Traits of Hit Tracks
+### Musical Qualities
 
 In addition to the duration and mode of songs, there are also a few noticeable trends in the Spotify qualities of hit music across the decades. Danceability, energy, and speechiness (the use of vocals) all saw a general upward trend over time, leveling out or decreasing slightly in the 2010s. On the other hand, we see the use of acousticness, as opposed to electric instruments, in tracks decline significantly from the 60’s onward. This downward trend is align with the historical development of more electronic instruments and their widespread use. Finally, valence, which describes the musical positiveness conveyed by a track, has also been trending downward since the 80’s. This decrease agrees with our finding in the previous section that indicates people prefer sadder songs in recent years.
 
