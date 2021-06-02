@@ -1,0 +1,157 @@
+---
+title: "Final project sections analysis part"
+author: "Tianyang Liu"
+date: "5/30/2021"
+output:
+  pdf_document: default
+  html_document: default
+  
+always_allow_html: true
+---
+
+```{r setup, include=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ 
+Stats MAS405 Spring 2021
+
+Tianyang Liu
+
+## Introduction
+
+<!--
+How is the section variable behave in the spotify dataset.
+-->
+ 
+```{r TOP, echo=FALSE, message=FALSE, eval=TRUE, results='hide'}
+projpath <- getwd()
+
+if(!exists("xdbsock")) {
+    xdbsock <- ""
+    cat("\n", "Parameter 'xdbsock' not found, setting to empty string for general usage", "\n")
+}
+
+
+library(RMySQL)
+library(knitr)
+library(xtable)
+library(plotly)
+# install.packages("data.table")           # Install and load data.table
+library("data.table")
+drv <- dbDriver("MySQL")
+
+```
+
+```{r, echo=FALSE, eval=TRUE, results='hide'}
+xdbuser <- Sys.getenv("MAS405_AWS_JW_DB_ADMIN_USER")
+xpw     <- Sys.getenv("MAS405_AWS_JW_DB_ADMIN_PW")
+xdbname <- Sys.getenv("MAS405_AWS_JW_DB_ADMIN_DBNAME")
+xdbhost <- Sys.getenv("MAS405_AWS_JW_DB_ADMIN_HOST")
+xdbport <- as.integer( Sys.getenv("MAS405_AWS_JW_DB_ADMIN_PORT") )
+
+
+con <- dbConnect(drv, user=xdbuser, password=xpw, dbname=xdbname, host=xdbhost, port=xdbport, unix.sock=xdbsock)
+
+```
+
+#### First load all the data from the database
+```{r, echo=FALSE, eval=TRUE, results='hide'}
+xbool.tableExists <- dbExistsTable(con, "music") ; xbool.tableExists
+
+qstr <- paste0("SELECT * FROM music")
+xx <- dbGetQuery(con, qstr)
+head(xx)
+```
+
+```{r}
+# Helper functions to get mode
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+#### Find the most common number of sections within Hot-100 tracks. It seems like the most common number of sections in Hot-100 tracks is 9.
+```{r, echo=FALSE, eval=TRUE, results='hide'}
+# Hot-100 tracks
+qstr <- paste0("SELECT track, sections FROM music WHERE hit = 1 ")
+hot_sections <- dbGetQuery(con, qstr)
+head(hot_sections)
+hist(hot_sections$sections, main = "Histgram of hot #sections", xlab = "Number of sections")
+getmode(hot_sections$sections)
+# Within hot tracks, tracks with 9 sections have the highest number
+```
+
+#### Split the dataset into 6 decades. Then I found out the most common number of sections in each decade. The line plot describes the main trend of number of section along with decades.
+```{r, echo=FALSE, eval=TRUE, results='hide'}
+# sections and decade
+qstr <- paste0("SELECT sections, decade FROM music")
+sections_decade <- dbGetQuery(con, qstr)
+sections_decade$decade <- strtoi(substr(sections_decade$decade, 1, 2))
+de_60 <- sections_decade[sections_decade$decade == 60, ]
+de_70 <- sections_decade[sections_decade$decade == 70, ]
+de_80 <- sections_decade[sections_decade$decade == 80, ]
+de_90 <- sections_decade[sections_decade$decade == 90, ]
+de_00 <- sections_decade[sections_decade$decade == 00, ]
+de_10 <- sections_decade[sections_decade$decade == 10, ]
+most_section_de <- c(getmode(de_60$sections), getmode(de_70$sections), getmode(de_80$sections), getmode(de_90$sections), getmode(de_00$sections), getmode(de_10$sections))
+x_axis <- 1:length(sections_decade$sections)
+
+most_sections_decades <- cbind(unique(sections_decade$decade), most_section_de)
+most_sections_decades <- data.frame(most_sections_decades)
+
+colnames(most_sections_decades) <- c("Decades", "Most Common #Sections")
+
+most_sections_decades
+plot(1:length(most_section_de), most_section_de, type = "l", xlab = "Decades", ylab = "Number of sections", xaxt = "n")
+axis(1, at=1:length(most_section_de), labels=c("60s", "70s", "80s", "90s", "00s", "10s"))
+
+```
+
+
+#### Analysis of the relationship between energy and the number of sections. It turns out that they might have a quadratic relationship between average energy and the number of sections from the range of 1-30 sections.
+```{r, echo=FALSE, eval=TRUE, results='hide'}
+# section and energy
+qstr <- paste0("SELECT sections, AVG(energy) as average_energy FROM music GROUP BY sections ORDER BY sections")
+sections_energy <- dbGetQuery(con, qstr)
+se_related <- sections_energy[1:30, ]
+plot(se_related$sections, se_related$average_energy, xlab = "sections", ylab = "average energy", type = "l")
+# The relationship between sections and average energy in total range
+plot(sections_energy$sections, sections_energy$average_energy, xlab = "sections", ylab = "average energy")
+ 
+
+```
+
+#### Analysis of the relationship between danceability and the number of sections. It turns out that they might also have a quadratic relationship between average danceability and the number of sections from the range of 1-30 sections.
+```{r}
+# sections and danceability
+qstr <- paste0("SELECT sections, AVG(danceability) as average_dance FROM music GROUP BY sections ORDER BY sections")
+sections_danceability <- dbGetQuery(con, qstr)
+head(sections_danceability)
+sd_related = sections_danceability[1:30, ]
+plot(se_related$sections, se_related$average_energy, xlab = "sections", ylab = "average energy", type = "l")
+# The relationship between sections and average energy in total range
+plot(sections_energy$sections, sections_energy$average_energy, xlab = "sections", ylab = "average energy")
+```
+
+#### Combine the average energy, average danceability, sections into one dataframe. Surprisingly, it turns out that average energy and average danceability is kind of having some linear relationship within the range of [1, 30] sections
+```{r}
+sd_related$average_energy <- se_related$average_energy
+fig <- plot_ly(x = sd_related$sections, y = sd_related$average_energy, z = sd_related$average_dance, type =  "scatter3d", mode = "lines")
+fig <- fig %>% layout(
+    title = "Relation between sections and energy&danceability",
+    scene = list(
+      xaxis = list(title = "sections"),
+      yaxis = list(title = "avg_energy"),
+      zaxis = list(title = "avg_danceability")
+    ))
+fig
+
+plot(se_related$average_energy, sd_related$average_dance, xlab = "average energy", ylab = "average danceability")
+avgvalue_30section <- data.frame(cbind(se_related$average_energy, sd_related$average_dance))
+colnames(avgvalue_30section) <- c("avg_energy", "avg_danceability")
+head(avgvalue_30section)
+```
+
+ 
