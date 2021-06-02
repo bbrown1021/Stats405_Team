@@ -1,0 +1,134 @@
+---
+output:
+  pdf_document: 
+  always_allow_html: yes
+---
+
+
+
+
+```{R, echo=FALSE, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE}
+library(RMySQL)
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(stringr)
+library(kableExtra)
+library(tm)
+library(wordcloud2)
+library(tidytext)
+library(htmlwidgets)
+library(webshot)
+webshot::install_phantomjs()
+```
+
+
+
+
+```{r TOP, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warning=FALSE}
+
+projpath <- getwd()
+
+if(!exists("xdbsock")) {
+    xdbsock <- ""
+    cat("\n", "Parameter 'xdbsock' not found, setting to empty string for general usage", "\n")
+}
+
+
+drv <- dbDriver("MySQL")
+
+
+xdbuser <- 'ROuser' ### 
+dzpw <- 'read_password' ### 
+xdbname <- 'db1' ### 
+xdbhost <- 'jwdatabase.c5stpagifptk.us-east-1.rds.amazonaws.com'
+xdbport <- 3306
+
+
+con <- dbConnect(drv, user=xdbuser, password=dzpw, dbname=xdbname, host=xdbhost, port=xdbport, unix.sock=xdbsock)
+
+```
+
+
+
+
+```{R, echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE}
+qstr <- "SELECT track from music"
+songs <- dbGetQuery(con, qstr)
+```
+
+
+
+```{R,  echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE, include = FALSE}
+corp <- VCorpus(VectorSource(songs$track))
+
+# Removing bad characters
+toSpace <- content_transformer(function(x, pattern) gsub(pattern, "[^a-zA-Z0-9]", x))
+
+cleaned <- tm_map(corp, toSpace, "/|@|\\|")
+  
+# Make lowercase
+cleaned <- tm_map(cleaned, content_transformer(tolower))
+  
+# Removing stop words and a couplt of stage directions
+cleaned <- tm_map(cleaned, removeWords, c(stopwords("english")))
+  
+# Removing punctuation
+cleaned <- tm_map(cleaned, removePunctuation)
+
+# Removing numbers
+cleaned <- tm_map(cleaned, removeNumbers)
+  
+# Trimming whitespace
+cleaned <- tm_map(cleaned, stripWhitespace)
+
+# Stemming
+cleaned <- tm_map(cleaned, stemDocument)
+  
+# Removing words that become nonsence from stemming and all that
+cleaned <- tm_map(cleaned, removeWords, c('zaz', 'ii', 'la', 'o', 'de', 'en', 'el', 'op'))
+
+# Splitted the words
+word_l <- strsplit(unlist(sapply(cleaned, '[', "content")), "[^A-Za-z']+")
+
+# Making a tibble
+tibble_total <- tibble(id = names(word_l), text=unlist(sapply(cleaned, '[', "content")))
+
+# Getting the tokens from the tibble
+tokenized <- tibble_total %>% unnest_tokens(word, text)
+
+# Making a token frame for wordcloud 2
+t.h <- data.frame(tokenized %>% count(word)) %>% subset(n > 150)
+
+```
+
+```{R, include = FALSE, warnings = FALSE, message = FALSE, echo = FALSE, results = 'hide'}
+
+# Making the color vector
+color_vec <- c('midnightblue', 'darkviolet', 'maroon','deeppink', 'darkgoldenrod', 'darkslategray', 'darkgreen')
+
+# Getting the length for each color in the cloud
+len <- round(length(t.h[["n"]])/length(color_vec))
+
+color_vec <- rep(color_vec, rep(len, length(color_vec)))
+
+
+titles <- wordcloud2(t.h, color = color_vec, shape = 'star', rotateRatio = .5)
+saveWidget(titles,"tmp.html",selfcontained = F)
+
+# and in png or pdf
+webshot("tmp.html","titles.png", delay =5)
+```
+
+![wordcloud](titles.png)
+
+
+```{R, results = 'asis', echo = FALSE}
+Variable <- c("Danceability", "Decade", "Key", "Section", "Time Signature", "Track")
+Definition <- c("How suitable a track is for dancing based on a combination of musical elements including rhythm \n stability, beat strength, overall regularity, etc.", "The decade that the song was labeled as a hit.", "The estimated overall key of the track.", "The number of sections the particular track has.", "An estimated time signature of a track in the number of beats in each bar.", "The name of the track.")
+
+vars <- data.frame(Variable, Definition)
+
+kable(vars, format = "latex") %>% column_spec(2, width = "40em")
+
+```
