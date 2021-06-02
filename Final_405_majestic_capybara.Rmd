@@ -77,13 +77,13 @@ dbGetInfo(con)
 
 \vspace{12pt}
 
-Write something
+TEXT TEXT TEXT
 
 \newpage
 
 # Introduction
 
-Everywhere we go, we are followed by melodies and catchy tunes that get stuck in our heads. But have you ever stopped to wonder why we love certain songs and have to turn the radio off on others? In this article, we will do just that by analyzing a Spotify database containing various musical attributes such as tempo, danceability, energy, and acousticness to get to the bottom of what truly makes a song popular. We will also examine if these features change over time, which would suggest a shift in musical preference as the entertainment industry, music, instruments, and we as a society evolve. 
+Everywhere we go, we are followed by melodies and catchy tunes that get stuck in our heads. But have you ever stopped to wonder why we love certain songs and have to turn off the radio for others? In this article, we will do just that by analyzing a Spotify database containing various musical attributes such as tempo, danceability, energy, and acousticness to get to the bottom of what truly makes a song popular. We will also examine if these features change over time, which would suggest a shift in musical preference as the entertainment industry, music, instruments, and we as a society evolve. 
 
 \vspace{12pt}
 
@@ -105,7 +105,7 @@ We then continue with a univariate analysis involving a deeper dive into three m
 
 Finally, we will use a visual analysis to explore how music has evolved in the last 50 years. 
 
-WHAT ABOUT SECTIONS????
+TEXT TEXT TEXT 
 
 
 \newpage 
@@ -297,6 +297,47 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
 
 ```
 
+```{r, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
+
+qstr <-
+paste0(
+"
+select artist
+		, avg(tempo) avg_song_tempo
+        , COUNT(DISTINCT track) count_songs
+from music
+group by artist
+HAVING  count_songs >= 10
+order by avg_song_tempo
+limit 10
+")
+
+df1 <- dbGetQuery(con, qstr)
+
+colnames(df1) <- c("Artist", "Average Song Tempo", "Total Number of Songs")
+
+
+# kable 
+if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
+  xxtb <- kable( df1, format='html', table.attr = "style='width:40% ;'"  )
+  xxtb
+  #kable_styling(xxtb)
+}
+if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
+  ###### "{ }\\" -- try to create some vertical space
+  xcaption <- paste0("Top 10 Artist/Bands with the Slowest Average Tempos")
+  rownames(df1) <- NULL
+  
+  xxMM <- kable(df1, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+
+  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+}
+
+
+```
+
+\newpage
+
 ### Time Signature
 
 Time signature indicates the rhythm of the song in terms of a beat's duration and the number of beats per measure. While it can get fairly technical, it is important to know that the most common time signature is 4 beats per measure (and is hence referred to as 'common time'). In fact, 88% of our dataset is made up of songs with common time. Compared to the other time signatures, common time has higher averages for danceability and energy but lower averages for acousticness. This time signature also has the highest success rate for hit songs with 43% of common time songs getting classified as a hit. As seen from the average rates in the table below, the success behind this time signature can be attributed to these songs being easier for people to dance to. Therefore, this table indicates that successful hit songs tend to higher levels of dancibility and energy. 
@@ -323,6 +364,7 @@ df3 <- dbGetQuery(con, qstr)
 
 colnames(df3) <- c("Time Signature", "Average Danceability", "Average Acousticness", "Average Energy", "Number of Tracks", "Number of Hits", "Percentage of Hit Tracks")
 
+df3$`Time Signature` <- as.character(df3$`Time Signature`)
 df3 <- t(df3)
 
 # kable 
@@ -341,8 +383,6 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 ```
-
-\newpage 
 
 ### Key Signature 
 
@@ -389,6 +429,8 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
 }
 ```
 
+\newpage 
+
 ## Danceability 
 
 Through our analysis of the music theory features, we discovered the importance of danceability. This attribute is defined by Spotify as a way to describe how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value close to 0 indicates a song difficult to dance to while 1 represents dance-friendly songs. However, since we do not know the specifics of Spotify's algorithm, we will explore the correlation of this feature with other variables in our dataset. 
@@ -415,8 +457,6 @@ corrplot::corrplot(danceable_cor,
          mar = c(2, 0, 5, 0)
 )
 ```
-
-\newpage
 
 TEXT TEXT TEXT
 
