@@ -294,6 +294,37 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
 
 
 ```
+## Danceability 
+```{r}
+db<- "
+SELECT * FROM music;"
+data <- dbGetQuery(con, db)
+
+
+danceable <- data[,5:19] 
+
+danceable %>% 
+  cor() %>% 
+  corrplot::corrplot(method = 'color',
+                     order = 'hclust',
+                     type = 'lower',
+                     addCoef.col = 'black',
+                     number.cex = .5,
+                     number.digits = 1.)
+
+# Most negatively correlated with danceability
+c1 <- danceable %>% ggplot(aes(acousticness, danceability)) + geom_jitter(color = "red", alpha = 0.3) + geom_smooth(color = "black")
+c2 <- danceable %>% ggplot(aes(instrumentalness, danceability)) + geom_jitter(color = "blue", alpha = 0.3) + geom_smooth(color = "black")
+
+ggpubr::ggarrange(c1, c2)
+
+# Most positively correlated with danceabiity
+c3 <- danceable %>% ggplot(aes(loudness, danceability)) + geom_jitter(color = "purple", alpha = 0.3) + geom_smooth(color = 'black')
+
+
+```
+
+
 
 ## More Stuff
 
