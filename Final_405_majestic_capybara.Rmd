@@ -73,9 +73,9 @@ dbListTables(con) # see what tables we have
 dbGetInfo(con)
 ```
 
-\newpage 
-
 # Abstract
+
+\vspace{12pt}
 
 Write something
 
@@ -87,9 +87,7 @@ REWRITE TO DESCRIBE QUESTION OF INTEREST
 
 We analyze a database of Spotify tracks that have had attributes assigned to them algorithmically by Spotify. These attributes act as descriptors for each track and allow us to group similar tracks and identify potentially interesting information and trends in the data. We have used this to analyze the songs in the Spotify database for what we found to be the most interesting questions. In the following sections we will cover the data more in depth, describe our methodology for exploring the data, and present our final analyses.
 
-
 \vspace{12pt}
-
 
 # Data Description
 
@@ -112,6 +110,8 @@ The next method of our analysis involves a deeper dive into three main music the
 \newpage 
 
 # Analysis
+
+QUICK DESCRIPTION OF ANALYSIS
 
 \vspace{12pt}
 
@@ -242,6 +242,8 @@ webshot("tmp.html","titles.png", delay =5)
 ![](titles.png)
 
 There are a number of key takeaways from the above plot, but we will start by asking the very question Tina Turner asked in 1984, "What's love got to do with it?" Well it appears love has a lot to do with it, with "it" being song titles. This word appears over 2000 times, which is much more than any other common word found in song titles from 1960-2019. The abundance of this makes absolute sense, since love is one of the most powerful emotions humans have put into words. So powerful, that love songs are commonly seen as more than emotion, but a genre. In addition, we see that love songs are not the only emotional genre listed in our dataset. The blues, heavily prevalent in the 1960s, also appears in the word cloud, leading us to believe that more emotive phrases are popular in song titles. 
+
+\vspace{12pt}
 
 Besides emotions and feelings, another topic arises as a common theme in song titles: people. More accurately, descriptions of who these people are to the artists of each song. This is reflected by the size the word “man”, “girl”, “baby”, or “boy” have in the word cloud, indicating a higher frequency in our data's song titles. Often times, people seem to talk about themselves and the people in their lives, which seems to hold true for music as well. Therefore, using just the title of the songs, we have established two significant themes in music: emotions and relationships.
 
@@ -437,9 +439,11 @@ ggpubr::ggarrange(c1, c2,c3,c4)
 
 ## Attributes by Decade
 
+TEXT TEXT TEXT
+
 ### Duration of Hit Tracks 
 
-The duration of hit tracks has mostly stayed under 10 minutes with an average closer to 4 minutes across the decades. One notable exception is in the 1970s, possibly due to the popularity of Progressive Rock during those years with the blending of Rock and Jazz Fusion into long, drawn-out concept albums and longer-winded tracks.
+The duration of hit tracks is genrally under 10 minutes with an average closer to 4 minutes across the decades. One notable exception is in the 1970s, possibly due to the popularity of Progressive Rock during those years with the blending of Rock and Jazz Fusion into long, drawn-out concept albums and longer-winded tracks.
 
 \vspace{12pt}
 
@@ -495,7 +499,7 @@ ggsave("Duration_By_Decade.png", device = "png", path = "plots")
 
 ### Proportion of Major/Minor Hit Tracks
 
-The proportion of hit songs in the minor mode has increased from about 15% in the 1960s to almost 30% in the 2010s. The minor mode generally sounds more sad, while the major has a happier sound--this may indicate that people have developed more of a taste for sad popular music over the years.
+The proportion of hit songs in the minor mode has increased from about 15% in the 1960s to almost 30% in the 2010s. The minor mode is associated with sadness, while the major has a happier sound. This signifies a potential trend that people have developed a taste for more depressing, saddening popular music over the last couple of decades.
 
 \vspace{12pt}
 
@@ -548,7 +552,7 @@ ggsave("Mode_By_Decade.png", device = "png", path = "plots")
 
 ### Traits of Hit Tracks
 
-There are a few noticeable trends in the qualities of hit music across the decades as assigned by Spotify. The use of acoustic as opposed to electric instruments of tracks declined significantly from the 60’s onward, as more and more electronic instruments were developed and put to widespread use. Danceability, energy, and speechiness (the use of voice) also saw a general upward trend. However valence, or the general noisiness of tracks, has been trending downward since the 80’s.
+In addition to the duration and mode of songs, there are also a few noticeable trends in the Spotify qualities of hit music across the decades. Danceability, energy, and speechiness (the use of vocals) all saw a general upward trend over time, leveling out or decreasing slightly in the 2010s. On the other hand, we see the use of acousticness, as opposed to electric instruments, in tracks decline significantly from the 60’s onward. This downward trend is align with the historical development of more electronic instruments and their widespread use. Finally, valence, which describes the musical positiveness conveyed by a track, has also been trending downward since the 80’s. This decrease agrees with our finding in the previous section that indicates people prefer sadder songs in recent years.
 
 \vspace{12pt}
 
