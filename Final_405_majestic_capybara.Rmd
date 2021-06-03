@@ -27,6 +27,7 @@ library(RMySQL)
 library(knitr)
 library(xtable)
 library(kableExtra)
+library(plotly)
 library(RMariaDB)
 library(DBI)
 library(ggplot2)
@@ -43,6 +44,12 @@ webshot::install_phantomjs()
 
 # Constants
 DECADE_ORDER <- c("60s\r", "70s\r", "80s\r", "90s\r", "00s\r", "10s\r")
+
+# Helper functions to get mode
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
 
 options(xtable.comment = FALSE) #### prevents commenting when printing xtable latex
 
@@ -73,11 +80,12 @@ dbListTables(con) # see what tables we have
 dbGetInfo(con)
 ```
 
-# Abstract
-
 \vspace{12pt}
 
-TEXT TEXT TEXT
+# Abstract
+
+Music has evolved significantly over the last fifty years from songs like the Beatles' "I Want to Hold Your Hand" to Taylor Swift's "Shake it Off." Although we hear these differences, how would we quantify them? Using data from Spotify, we will take a statistical approach to analyze song construction and visualize what makes certain songs timeless and others forgettable. We begin by diving into the intricacies of our dataset to help us further explore a variety of music trends over the last several decades. With a particular focus on high-producing artists, song titles, and music attributes, we will solidify the overall trends found in songs over time. We then analyze the qualities found in hit tracks and their relationship with the structure of a song. At the end of our analysis, we will have a better interpretation of musical trends as well as a greater understanding of the modern music world. 
+
 
 \newpage
 
@@ -103,16 +111,13 @@ We will then shift into an anaylis of song titles and what terms appear most fre
 
 We then continue with a univariate analysis involving a deeper dive into three main music theory attributes: tempo, time signature, and key signature. Any musician can look at sheet music, recognize these characteristics, and immediately know exactly how to play the song. But we will take it one step further and compare the various levels of these features to understand their effect on the popularity of a song.
 
-Finally, we will use a visual analysis to explore how music has evolved in the last 50 years. 
-
-TEXT TEXT TEXT 
-
+Finally, we will use a visual analysis to explore how music has evolved in the last 50 years in relation to the number of sections that occur within a song. In combination with decades, this bivariate approach will allow us to compare and contrast the effect a song's shape has on its popularity. 
 
 \newpage 
 
 # Analysis
 
-QUICK DESCRIPTION OF ANALYSIS
+For our analysis, we will cover six aspects of our dataset that were beneficial in providing a finer comprehension of musical trends in popularity. Beginning with the creators themselves, we will explore artists with high song productions for a broad view of the music industry evolution. We then branch off to explore the song titles using text mining techniques to detect common themes in songs. From here, we will explore variables such as tempo, time signature, key signature, danceability, and energy that define what makes a song relatable and loveable. Finally, we will end by exploring the structure of songs and their relationship with musical attributes.
 
 \vspace{12pt}
 
@@ -437,7 +442,7 @@ Through our analysis of the music theory features, we discovered the importance 
 
 \vspace{6pt}
 
-```{r echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE, fig.height = 7, fig.width =12}
+```{r echo=FALSE, message=FALSE, eval=TRUE, results='hide', warning = FALSE, fig.height = 7, fig.width =12}
 
 db<- "SELECT * FROM music;"
 data <- dbGetQuery(con, db)
@@ -480,7 +485,7 @@ ggpubr::ggarrange(c1, c2,c3,c4)
 
 ## Attributes of Hit Tracks by Decade
 
-TEXT TEXT TEXT
+In this section of the analysis, we will visualize the distribution of a song's duration and major/minor mode across six decades. We will also explore the trends in Spotify's defined variables such as speechiness, acousticness, and valence.
 
 ### Duration of Song
 
@@ -633,6 +638,104 @@ ggplot(data = avg_traits_by_decade,
 ggsave("Traits_By_Decade.png", device = "png", path = "plots")
 ```
 
+## Sections of a Song
+
+The final portion of our analysis explores the behavior of the section variable.Each track is broken up into various sections, to describe what musicians refer to as the intro, verses, pre-chorus, chorus, bridge, and outro of a song. Throughout our analysis, we have seen the effect of univariate variables on the popularity of songs and will continue with a bivariate approach using visuals to understand how music changes as the number of sections differ from track to track.
+
+### Most Common Number of Sections 
+
+We begin by subsetting our data into hit tracks that belong to one of the six decades in our dataset and were featured in at least one week of the Billboards 'Top 100' list. Overall, the most common number of sections of a song  is nine: intro, verse 1, pre-chorus, chorus, verse 2, pre-chorus, chorus, bridge, outro. 
+
+```{r, echo=FALSE, eval=FALSE, results='hide', warning = FALSE}
+# Hot-100 tracks
+qstr <- paste0("SELECT track, sections FROM music WHERE hit = 1 ")
+hot_sections <- dbGetQuery(con, qstr)
+head(hot_sections)
+hist(hot_sections$sections, main = "Histgram of hot #sections", xlab = "Number of sections")
+getmode(hot_sections$sections)
+# Within hot tracks, tracks with 9 sections have the highest number
+```
+
+The following line plot demonstrates the most commonly used number of sections per decade. The trend indicates that even though the overall mode is 9 sections, we see an increase into the 1980s which tend to spread their tracks into 11 sections. We then see a decrease in this variable in 1990s, returning to the common 9 sections in the most recent years. This is likely due to the fact that many 80s songs are considered more experimental compared to the highly algotihmic way of producing songs by current music entertainers. 
+
+```{r, echo=FALSE, eval=TRUE, results='hide', warning = FALSE, message = FALSE}
+
+# sections and decade
+qstr <- paste0("SELECT sections, decade FROM music")
+sections_decade <- dbGetQuery(con, qstr)
+
+sections_decade$decade <- strtoi(substr(sections_decade$decade, 1, 2))
+de_60 <- sections_decade[sections_decade$decade == 60, ]
+de_70 <- sections_decade[sections_decade$decade == 70, ]
+de_80 <- sections_decade[sections_decade$decade == 80, ]
+de_90 <- sections_decade[sections_decade$decade == 90, ]
+de_00 <- sections_decade[sections_decade$decade == 00, ]
+de_10 <- sections_decade[sections_decade$decade == 10, ]
+most_section_de <- c(getmode(de_60$sections), getmode(de_70$sections), getmode(de_80$sections), getmode(de_90$sections), getmode(de_00$sections), getmode(de_10$sections))
+
+#x_axis <- 1:length(sections_decade$sections)
+
+most_sections_decades <- cbind(unique(sections_decade$decade), most_section_de)
+most_sections_decades <- data.frame(most_sections_decades)
+
+colnames(most_sections_decades) <- c("Decades", "Most Common Sections")
+
+# most_sections_decades
+plot(1:length(most_section_de), most_section_de, type = "l", xlab = "Decades", ylab = "Number of Sections", xaxt = "n", yaxt = "n")
+axis(1, at=1:length(most_section_de), labels=c("60s", "70s", "80s", "90s", "00s", "10s"))
+axis(2, at = 7:12, labels=c("7","8","9","10","11","12"))
+
+```
+
+### Relationship with Energy and Danceability
+
+One interesting find in regards to sections is the relationship the variable has with the average energy and danceability, both of which are nearly quadratic across the range of sections. This can be interpreted to mean that a song with a reasonable amount of sections tends to have higher energy and are easier to dance to. For example, let us compare a pop song to a piano sonata. A pop song generally has 9-10 sections while sonatas have approximately 20 sections. If we imagine having to tell a story in 10 chapters verses 20, it is easy to believe the story with less chapters will be more crammed and full of drama. The same thing applies to songs; to tell an entire 20 section story in half the space, a pop song would have to compensate with more dramatic sounds and lyrics, hence the higher levels of energy and danceability. 
+
+```{r, echo=FALSE, eval=TRUE, results='hide', warning = FALSE}
+# section and energy
+qstr <- paste0("SELECT sections, AVG(energy) as average_energy FROM music GROUP BY sections ORDER BY sections")
+sections_energy <- dbGetQuery(con, qstr)
+sd_related_energy <- sections_energy[1:30, ]
+
+# sections and danceability
+qstr <- paste0("SELECT sections, AVG(danceability) as average_dance FROM music GROUP BY sections ORDER BY sections")
+sections_danceability <- dbGetQuery(con, qstr)
+#head(sections_danceability)
+sd_related_dance = sections_danceability[1:30, ]
+
+par(mfrow = c(1,2))
+
+plot(sd_related_energy$sections, sd_related_energy$average_energy, xlab = "Sections", ylab = "Average Energy", type = "l")
+# The relationship between sections and average energy in total range
+
+plot(sd_related_dance$sections, sd_related_dance$average_dance, xlab = "Sections", ylab = "Average Danceability", type = "l")
+# The relationship between sections and average energy in total range
+```
+
+<!-- When we look at average energy, danceability, and sections in the following 3D graph, we see a linear relationship. In simple terms, this indicates the Spotify's definition of danceability might be the same intrinsic feature as energy since they depict a very similar trend across the range of sections. Therefore, we can conclude that the ability to dance to a song is heavily reliant on the energy it conveys. The more spirited a track is, the more likely people are to boogie! -->
+
+```{r echo=FALSE, eval=TRUE, results='hide', warning = FALSE}
+sd_related_energy$average_energy <- sd_related_energy$average_energy
+fig <- plot_ly(x = sd_related_energy$sections, y = sd_related_energy$average_energy, z = sd_related_dance$average_dance, type =  "scatter3d", mode = "lines")
+fig <- fig %>% layout(
+    title = "Relation between Sections, Energy, and Danceability",
+    scene = list(
+      xaxis = list(title = "Sections"),
+      yaxis = list(title = "Average Energy"),
+      zaxis = list(title = "Average Danceability")
+    ))
+
+# fig
+```
+
+<!-- ![](3Dplot) -->
+
+```{r echo=FALSE, eval=FALSE, results='hide', warning = FALSE}
+plot(sd_related_energy$average_energy, sd_related_dance$average_dance, xlab = "average energy", ylab = "average danceability")
+avgvalue_30section <- data.frame(cbind(sd_related_energy$average_energy, sd_related_dance$average_dance))
+colnames(avgvalue_30section) <- c("avg_energy", "avg_danceability")
+head(avgvalue_30section)
+```
 
 ```{r echo=FALSE, eval=TRUE, results='hide', warning=FALSE, message = FALSE}
 # Disconnect from database to clean up connection
@@ -641,9 +744,12 @@ dbDisconnect(con)
 
 # Conclusions
 
-From this overview of Spotify songs, we can get an idea of the musical tastes of listeners and songwriting trends over the decades. [Tie analyses together with a general idea of what we found]. With more data we could answer some interesting business questions, such as creating a recommendation engine by clustering listener habits, or finding song attributes that users are most attracted to.
+From this overview of Spotify songs, we have obtained an idea of the evolution of musical tastes and songwriting trends over the last several decades. Using text mining, we discovered two important themes that span across all time: emotions and relationships. Regardless of societal evolution, expressing our emotions towards the people we care for seems to be a constant force. We also explored various aspects of our tracks such as key and time signature, danceability, energy, duration, and acousticness. Through this section of the analysis, we discovered that people tend to prefer sad, depressing songs more in the recent years. This was verified by exploring the major/minor modes as well as valence of songs across multiple decades. 
 
-TEXT TEXT TEXT
+A visual exploration of our section variables revealed that in the last 20 years, tracks have consistently maintained approximately nine sections. This steady approach to song structure highly suggests the introduction of a breakthrough algorithmic approach towards song creation in order to increase success potential. This ties in with our first table which indicates that as time goes on, artists produce less songs per decade. The combination of these two results lead us to believe that with the expanding talent in the current entertainment industry, there has been a recent surge towards focusing on the quality of musical outputs in order to stand out. 
+
+With more data, and possibly the baseline of Spotify's musical attribute assignment algorithm, we could utilize our brand new knowledge for improvement, such as finding song attributes that users are most attracted to or creating a recommendation engine by clustering listener habits.
+
 
 \newpage
 
