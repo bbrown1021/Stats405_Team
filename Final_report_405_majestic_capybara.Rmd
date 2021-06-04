@@ -64,7 +64,6 @@ if(!exists("xdbsock")) {
 
 drv <- dbDriver("MySQL") # create driver object
 
-
 # connect to Jeremy's database
 db_host <- Sys.getenv("db_read_endpoint")
 db_user <- Sys.getenv("db_read_user")
@@ -78,7 +77,14 @@ con <- dbConnect(db_drv, user=db_user, password=db_pw, dbname=db_name, host=db_h
 dbListTables(con) # see what tables we have 
 
 dbGetInfo(con)
+
+##### make dataDictionary JSON
+# yy <- dbGetQuery(con, "SELECT * FROM dataDictionary")
+# writeLines(yy[ 1, "variableDefs"], file.path("~", "Desktop", "DataDictionary.json"))
+
 ```
+
+
 
 \vspace{12pt}
 
