@@ -29,6 +29,16 @@ indent: true
 
 Music has been an integral part of our culture since well before the invention of the computer. Lately we have seen digital music take the industry by storm, which for the first time in musical history gives us the ability to analyze the quantifiable components of the music we all enjoy. Popular music has evolved significantly over the last fifty years from songs like the Beatles' "I Want to Hold Your Hand" to Taylor Swift's "Shake it Off." Although we recognize a shift here, what can the data behind these songs tell us about trends in the music industry?
 
+Through our analysis, we revealed four **Key Insights**: 
+
+- We discovered two important themes that span across all time: emotions and relationships. Regardless of societal evolution, expressing our emotions towards the people we care for seems to be a constant force. 
+
+- We also found that people tend to prefer sad, depressing songs more in recent years. A quick scan of current events through recent years will probably make this one of our less surprising findings.
+
+- In order for a song to be "danceable", there should be some acoustic presence, high valence (positive sounds), a slightly above average loudness, and finally to avoid too much instrumentalness. 
+
+- In the last 20 years, tracks have consistently maintained approximately nine sections. This steady approach to song structure highly suggests the introduction of a breakthrough algorithmic approach towards song creation in order to increase success potential. 
+
 \vspace{8pt}
 
 Using data from Spotify, we analyzed song construction to see what makes particular songs timeless and others forgettable. We looked at the overall trends found in songs over time and analyzed qualities that hit tracks seem to have in common. Our overall goal was to get a better interpretation of musical trends and a greater understanding of the modern music world. 
@@ -38,14 +48,6 @@ Using data from Spotify, we analyzed song construction to see what makes particu
 Data available to us in this analysis was a wide range of descriptive statistics about a given selection of tracks including danceability, energy, key, loudness, tempo, decade and whether or not the track was a “hit” amongst other variables.
 
 \vspace{8pt}
-
-**Key insights**: 
-
-- We discovered two important themes that span across all time: emotions and relationships. Regardless of societal evolution, expressing our emotions towards the people we care for seems to be a constant force. 
-
-- We also found that people tend to prefer sad, depressing songs more in recent years. A quick scan of current events through recent years will probably make this one of our less surprising findings.
-
-- In the last 20 years, tracks have consistently maintained approximately nine sections. This steady approach to song structure highly suggests the introduction of a breakthrough algorithmic approach towards song creation in order to increase success potential. 
 
 Further in the analysis we take a look at how danceability relates to other song attributes such as acousticness, instrumentalness, loudness and valence to determine what features make a song a bop rather than a ballad.
 
