@@ -493,21 +493,23 @@ In the above correlation plot, acousticness and instrumentalness are the most ne
 # Most negatively correlated with danceability
 c1 <- danceable %>% ggplot(aes(acousticness, danceability)) + 
   geom_jitter(color = "red", alpha = 0.3) + 
-  geom_smooth(color = "black") + 
-  theme(axis.title.x = element_text(size = 7.5),
-        axis.title.y = element_text(size = 7.5))+  
-  theme_minimal()
-c2 <- danceable %>% ggplot(aes(instrumentalness, danceability)) + geom_jitter(color = "orange", alpha = 0.3) + geom_smooth(color = "black") + 
-  theme(axis.title.x = element_text(size = 7.5),
-        axis.title.y = element_text(size = 7.5)) + theme_minimal()
+  geom_smooth(color = "black")  + theme_minimal()
+c2 <- danceable %>% ggplot(aes(instrumentalness, danceability)) + 
+  geom_jitter(color = "orange", alpha = 0.3) + 
+  geom_smooth(color = "black")  + theme_minimal()
 
 # Most positively correlated with danceabiity
-c3 <- danceable %>% ggplot(aes(loudness, danceability)) + geom_jitter(color = "blue", alpha = 0.3) + geom_smooth(color = 'black')+ 
-  theme(axis.title.x = element_text(size = 7.5),
-        axis.title.y = element_text(size = 7.5)) + theme_minimal()
-c4 <- danceable %>% ggplot(aes(valence, danceability)) + geom_jitter(color = "purple", alpha = 0.3) + geom_smooth(color = 'black') + 
-  theme(axis.title.x = element_text(size = 7.5),
-        axis.title.y = element_text(size = 7.5)) + theme_minimal()
+c3 <- danceable %>% ggplot(aes(loudness, danceability)) + 
+  geom_jitter(color = "blue", alpha = 0.3) + 
+  geom_smooth(color = 'black') + theme_minimal()
+c4 <- danceable %>% ggplot(aes(valence, danceability)) + 
+  geom_jitter(color = "purple", alpha = 0.3) + 
+  geom_smooth(color = 'black')  + theme_minimal()
+
+c1 <- c1 + theme(axis.title.x = element_text(size = 10),axis.title.y = element_text(size = 10))
+c2 <- c2 + theme(axis.title.x = element_text(size = 10),axis.title.y = element_text(size = 10))
+c3 <- c3 + theme(axis.title.x = element_text(size = 10),axis.title.y = element_text(size = 10))
+c4 <- c4 + theme(axis.title.x = element_text(size = 10),axis.title.y = element_text(size = 10))
 
 ggpubr::ggarrange(c1, c2,c3,c4)
 ```
@@ -558,7 +560,7 @@ GROUP BY
 result5 <- dbGetQuery(con, query5)
 result6 <- dbGetQuery(con, query6)
 
-ggplot(data = result5,
+p <- ggplot(data = result5,
        aes(x = factor(decade, level = DECADE_ORDER), y = duration, color = decade)) +
   geom_point(position = position_jitter(w = 0.2)) +
   geom_errorbar(data = result6, mapping = aes(x = decade, y = avg_duration,
@@ -568,9 +570,11 @@ ggplot(data = result5,
                 color = 'black', width = 0.2) +
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   xlab("Decade") +
-  ylab("Duration (minutes)") +
-  theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) +
+  ylab("Duration (in minutes)") +
   theme_minimal()
+p + theme(legend.position = "none", 
+          axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10))
 
 ggsave("Duration_By_Decade.png", device = "png", path = "plots")
 ```
@@ -586,12 +590,12 @@ The proportion of hit songs in the minor mode has increased from about 15% in th
 mode_query <- "
 SELECT
   CASE
-    WHEN decade = '60s\r' THEN '1960'
-    WHEN decade = '70s\r' THEN '1970'
-    WHEN decade = '80s\r' THEN '1980'
-    WHEN decade = '90s\r' THEN '1990'
-    WHEN decade = '00s\r' THEN '2000'
-    WHEN decade = '10s\r' THEN '2010'
+    WHEN decade = '60s\r' THEN '1960s'
+    WHEN decade = '70s\r' THEN '1970s'
+    WHEN decade = '80s\r' THEN '1980s'
+    WHEN decade = '90s\r' THEN '1990s'
+    WHEN decade = '00s\r' THEN '2000s'
+    WHEN decade = '10s\r' THEN '2010s'
     ELSE 'Unknown Decade'
   END
   , song_mode
@@ -612,24 +616,28 @@ mode_proportions_by_decade <- mode_result %>%
   summarize(n = n()) %>%
   mutate(mode_percent = n / sum(n) * 100)
 
-
-ggplot(data = mode_proportions_by_decade,
-       aes(x = as.numeric(decade), y = mode_percent, fill = factor(song_mode))
+labels <-  c("1960s","1970s", "1980s","1990s","2000s","2010s") 
+p <- ggplot(data = mode_proportions_by_decade,
+       aes(x = decade, y = mode_percent, fill = factor(song_mode))
        ) +
   geom_bar(stat = "identity") +
   xlab("Decade") +
   ylab("Percentage") +
   scale_fill_manual(name = "Mode", # Legend options
                     labels = c("Minor", "Major"),
-                    values = c("#619CFF", "#F8766D"))+
-  theme(plot.title = element_text(hjust = 0.5)) + theme_minimal()
+                    values = c("#619CFF", "#F8766D")) + theme_minimal() +
+  scale_x_discrete(limits = labels)
+
+p + theme(legend.position = "none", 
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 ggsave("Mode_By_Decade.png", device = "png", path = "plots")
 ```
 
 \newpage
 
-### Additional Musical Qualities
+### Additional Musical Attributes
 
 In addition to the duration and mode of songs, there are also a few noticeable trends in the Spotify qualities of hit music across the decades. Danceability, energy, and speechiness (the use of vocals) all saw a generally upward trend over time, leveling out or decreasing slightly in the 2010s. On the other hand, we see the use of acoustics, as opposed to electric instruments, in tracks decline significantly from the 60's onward. This downward trend is aligned with the historical development of more electronic instruments and their widespread use. Finally, valence, which describes the musical positiveness conveyed by a track, has also been trending downward since the '80s. This decrease agrees with our finding in the previous section that indicates people prefer sadder songs in recent years.
 
@@ -657,19 +665,26 @@ avg_traits_by_decade <- overview_result %>%
   summarize_all("mean") %>%
   melt(id = "decade")
 
-ggplot(data = avg_traits_by_decade,
+avg_traits_by_decade$`Musical Attribute` <- avg_traits_by_decade$variable
+
+p <- ggplot(data = avg_traits_by_decade,
        aes(x = factor(decade, level = DECADE_ORDER),
-           y = value, color = variable)
+           y = value, color = `Musical Attribute`)
        ) +
-  geom_line(aes(group = variable), size = 1) +
+  geom_line(aes(group = `Musical Attribute`), size = 1) +
   geom_point() +
   xlab("Decade") +
   ylab("Value") +
   scale_y_continuous(limits = c(0, 1.0)) +
   theme(legend.title = element_blank(), plot.title = element_text(hjust = 0.5),
-        axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10)) +
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        legend.text=element_text(size=7)) +
   theme_minimal()
+
+p + theme(axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10),
+          legend.title = element_text(size = 10))
 
 ggsave("Traits_By_Decade.png", device = "png", path = "plots")
 ```
@@ -721,9 +736,13 @@ most_sections_decades <- data.frame(most_sections_decades)
 colnames(most_sections_decades) <- c("Decades", "Most Common Sections")
 
 # most_sections_decades
-plot(1:length(most_section_de), most_section_de, type = "l", xlab = "Decades", ylab = "Number of Sections", xaxt = "n", yaxt = "n", main = "Most Common Number of Sections per Decade", cex.axis = 0.7, cex.main = 0.9)
-axis(1, at=1:length(most_section_de), labels=c("60s", "70s", "80s", "90s", "00s", "10s"))
-axis(2, at = 7:12, labels=c("7","8","9","10","11","12"))
+plot(1:length(most_section_de), most_section_de, type = "l", xaxt = "n", yaxt = "n", ylab = "", xlab = "")
+mtext(side = 3, "Most Common Number of Sections per Decade", line = 0.4, cex = 0.8, font =2)
+mtext(side = 2, "Number of Sections", line = 2, cex = 0.8, font =1)
+mtext(side = 1, "Decades", line = 2, cex = 0.8, font =1)
+axis(1, at=1:length(most_section_de), labels=c("60s", "70s", "80s", "90s", "00s", "10s"), cex.axis = 0.7, font = 0)
+axis(2, at = 7:12, labels=c("7","8","9","10","11","12"), las = 2, cex.axis = 0.7, font = 0)
+
 ```
 
 ### Relationship with Energy and Danceability
@@ -743,10 +762,16 @@ sd_related_dance = sections_danceability[1:30, ]
 
 par(mfrow = c(1,2))
 
-plot(sd_related_energy$sections, sd_related_energy$average_energy, xlab = "Sections", ylab = "Average Energy", type = "l")
+plot(sd_related_energy$sections, sd_related_energy$average_energy, xlab = "", ylab = "", type = "l", cex.lab = 0.9, yaxt = "n", cex.axis = 0.7)
+axis(2, las=2, cex.axis = 0.7)
+mtext(side = 2, "Average Energy", line = 3, cex = 0.9, font =1)
+mtext(side = 1, "Sections", line = 2, cex = 0.8, font =1)
 # The relationship between sections and average energy in total range
 
-plot(sd_related_dance$sections, sd_related_dance$average_dance, xlab = "Sections", ylab = "Average Danceability", type = "l")
+plot(sd_related_dance$sections, sd_related_dance$average_dance, xlab = "", ylab = "", type = "l", cex.lab = 0.9, yaxt = "n", cex.axis = 0.7)
+axis(2, las=2, cex.axis = 0.7)
+mtext(side = 2, "Average Danceability", line = 3, cex = 0.9, font =1)
+mtext(side = 1, "Sections", line = 2, cex = 0.8, font =1)
 # The relationship between sections and average energy in total range
 ```
 
