@@ -4,7 +4,7 @@ subtitle: "An Analysis of Music Popularity over Time"
 author: 
 - Britney Brown, Harrison DiStefano, Greg Eastman
 - Lisa Kaunitz, Tianyang Liu, Jeremy Weidner
-date: "06/04/2021"
+date: "06/09/2021"
 geometry: 'left=20mm, right=20mm, top=20mm, bottom=20mm'
 output:
   pdf_document:
@@ -115,7 +115,7 @@ This analysis will use a variety of investigative techniques to explore the data
 
 \vspace{10pt}
 
-We will then shift into an analysis of song titles and what terms appear most frequently. Nowadays, it is common practice to use specific pictures and words in social media and online videos to attract wider audiences. This same logic applies to song titles. However, instead of simply displaying the most common words, we will first "clean" the song titles using the tm[2] package and tidytext[3] to gain insight of the bigger picture. This cleaning process involves converting all text to lowercase then removing non-alphabetical characters, punctuation, and stop words that exist simply as determiners to mark nouns like "the," coordinating conjunctions like "but," or prepositions like "in." While these terms help to form a language, they do not hold any meaning for our song titles and are removed to decrease clutter in the text portion of the analysis. The final step of our cleaning process was to stem the text. This process alters words to return them to their root meaning. An example in our data was changing the words "remastered," "remaster," and "remastering" into their root: "remast." This allows us to interpret all these separate terms as the same term. With a clean text corpus, we then created a word cloud as a method to understand the frequent concepts in song titles. 
+We will then shift into an analysis of song titles and what terms appear most frequently. Nowadays, it is common practice to use specific pictures and words in social media and online videos to attract wider audiences. This same logic applies to song titles. However, instead of simply displaying the most common words, we will first "clean" the song titles using the tm[2] package and tidytext[3] to gain insight of the bigger picture. This cleaning process involves converting all text to lowercase then removing non-alphabetical characters, punctuation, and stop words that exist simply as determiners to mark nouns like "the", coordinating conjunctions like "but", or prepositions like "in". While these terms help to form a language, they do not hold any meaning for our song titles and are removed to decrease clutter in the text portion of the analysis. The final step of our cleaning process was to stem the text. This process alters words to return them to their root meaning. An example in our data was changing the words "remastered", "remaster", and "remastering" into their root: "remaster". This allows us to interpret all these separate terms as the same term. With a clean text corpus, we then created a word cloud as a method to understand the frequent concepts in song titles. 
 
 \vspace{10pt}
 
@@ -267,7 +267,7 @@ There are a number of key takeaways from the above plot, but we will start by as
 
 \vspace{12pt}
 
-Besides emotions and feelings, another topic arises as a common theme in song titles: people. More accurately, descriptions of who these people are to the artists of each song. This is reflected by the size the word "man," "girl," "baby," or "boy" have in the word cloud, indicating a higher frequency in our data's song titles. Oftentimes, people seem to talk about themselves and the people in their lives, which seems to hold true for music as well. Therefore, using just the title of the songs, we have established two significant themes in music: emotions and relationships.
+Besides emotions and feelings, another topic arises as a common theme in song titles: people. More accurately, descriptions of who these people are to the artists of each song. This is reflected by the size the word "man", "girl", "baby", or "boy" have in the word cloud, indicating a higher frequency in our data's song titles. Oftentimes, people seem to talk about themselves and the people in their lives, which seems to hold true for music as well. Therefore, using just the title of the songs, we have established two significant themes in music: emotions and relationships.
 
 \newpage
 
