@@ -176,9 +176,12 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   xcaption <- paste0("Top 5 Artist/Bands with the Most Songs per Decade")
   rownames(df2) <- NULL
   
-  xxMM <- kable(df2, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  XX <- kable(df2, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  
+  # fix first line default indent
+  XX <- add_indent(XX, c(1), level_of_indent = -0.5, all_cols = FALSE)
 
-  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+  kable_styling(XX, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 
 
@@ -200,25 +203,25 @@ corp <- VCorpus(VectorSource(songs$track))
 toSpace <- content_transformer(function(x, pattern) gsub(pattern, "[^a-zA-Z0-9]", x))
 
 cleaned <- tm_map(corp, toSpace, "/|@|\\|")
-  
+
 # Make lowercase
 cleaned <- tm_map(cleaned, content_transformer(tolower))
-  
+
 # Removing stop words and a couplt of stage directions
 cleaned <- tm_map(cleaned, removeWords, c(stopwords("english")))
-  
+
 # Removing punctuation
 cleaned <- tm_map(cleaned, removePunctuation)
 
 # Removing numbers
 cleaned <- tm_map(cleaned, removeNumbers)
-  
+
 # Trimming whitespace
 cleaned <- tm_map(cleaned, stripWhitespace)
 
 # Stemming
 cleaned <- tm_map(cleaned, stemDocument)
-  
+
 # Removing words that become nonsence from stemming and all that
 cleaned <- tm_map(cleaned, removeWords, c('zaz', 'ii', 'la', 'o', 'de', 'en', 'el', 'op'))
 
@@ -228,7 +231,7 @@ toString <- content_transformer(function(x,from,to) gsub(from, to, x))
 cleaned  <- tm_map(cleaned , toString, "danc", "dance")
 cleaned  <- tm_map(cleaned , toString, "littl", "little")
 cleaned  <- tm_map(cleaned , toString, "babi", "baby")
-
+cleaned  <- tm_map(cleaned , toString, "remast", "remaster")
 
 # Splitted the words
 word_l <- strsplit(unlist(sapply(cleaned, '[', "content")), "[^A-Za-z']+")
@@ -260,7 +263,7 @@ webshot("tmp.html","titles.png", delay =5)
 
 ![](titles.png)
 
-There are a number of key takeaways from the above plot, but we will start by asking the very question Tina Turner asked in 1984, "What's love got to do with it?" Well, it appears love has a lot to do with it, with "it" being song titles. This word appears over 2000 times, which is much more than any other common word found in song titles from 1960-2019. The abundance of this makes absolute sense since love is one of the most powerful emotions humans have put into words. So powerful that love songs are commonly seen as more than emotion, but a genre. In addition, we see that love songs are not the only emotional genre listed in our dataset. The blues, heavily prevalent in the 1960s, also appears in the word cloud, leading us to believe that more emotive phrases are popular in song titles. 
+There are a number of key takeaways from the above plot, but we will start by asking the very question Tina Turner asked in 1984, "What's love got to do with it?" Well, it appears love has a lot to do with it, with "it" being song titles. This word appears over 2000 times, which is much more than any other common word found in song titles from 1960-2019. The abundance of this makes absolute sense since love is one of the most powerful emotions humans have put into words. So powerful that love songs are commonly seen as more than emotion, but a genre. In addition, we see that love songs are not the only emotional genre listed in our dataset. The blues, heavily prevalent in the 1960s, also appears in the word cloud, leading us to believe that more emotive phrases are popular in song titles.
 
 \vspace{12pt}
 
@@ -270,7 +273,7 @@ Besides emotions and feelings, another topic arises as a common theme in song ti
 
 ## Music Theory Attributes
 
-Now that we have explored the artists and song titles, we will examine some of the musical attributes themselves. We will begin with three fundamental music theory concepts that every musician lives and breathes: tempo, time signature, and key signature. 
+Now that we have explored the artists and song titles, we will examine some of the musical attributes themselves. We will begin with three fundamental music theory concepts that every musician lives and breathes: tempo, time signature, and key signature.
 
 ### Tempo
 
@@ -307,16 +310,16 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   xcaption <- paste0("Top 10 Artist/Bands with the Fastest Average Tempos")
   rownames(df1) <- NULL
 
-  xxMM <- kable(df1, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  XX <- kable(df1, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  
+  # fix first line default indent
+  XX <- add_indent(XX, c(1), level_of_indent = -0.3, all_cols = FALSE)
 
-  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+  kable_styling(XX, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
-
-
 ```
 
 ```{r, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
-
 qstr <-
 paste0(
 "
@@ -346,9 +349,12 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   xcaption <- paste0("Top 10 Artist/Bands with the Slowest Average Tempos")
   rownames(df1) <- NULL
 
-  xxMM <- kable(df1, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  XX <- kable(df1, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  
+  # fix first line default indent
+  XX <- add_indent(XX, c(1), level_of_indent = -0.3, all_cols = FALSE)
 
-  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+  kable_styling(XX, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 
 
@@ -358,7 +364,7 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
 
 ### Time Signature
 
-Time signature indicates the rhythm of the song in terms of a beat's duration and the number of beats per measure. While it can get fairly technical, it is essential to note that the most common time signature is four beats per measure (and is hence referred to as 'common time'). In fact, 88% of our dataset is made up of songs with common time. Compared to the other time signatures, common time has higher averages for danceability and energy but lower averages for acousticness. This time signature also has the highest success rate for hit songs, with 43% of common time songs getting classified as a hit. As seen from the average rates in the table below, the success behind this time signature can be attributed to these songs being more accessible for dancing. Therefore, this table indicates that successful hit songs tend to higher levels of danceability and energy. 
+Time signature indicates the rhythm of the song in terms of a beat's duration and the number of beats per measure. While it can get fairly technical, it is essential to note that the most common time signature is four beats per measure (and is hence referred to as 'common time'). In fact, 88% of our dataset is made up of songs with common time. Compared to the other time signatures, common time has higher averages for danceability and energy but lower averages for acousticness. This time signature also has the highest success rate for hit songs, with 43% of common time songs getting classified as a hit. As seen from the average rates in the table below, the success behind this time signature can be attributed to these songs being more accessible for dancing. Therefore, this table indicates that successful hit songs tend to higher levels of danceability and energy.
 
 ```{r, echo=FALSE, eval=TRUE, results='asis', warning=FALSE}
 # 36117/40886
@@ -385,7 +391,7 @@ colnames(df3) <- c("Time Signature", "Average Danceability", "Average Acousticne
 df3$`Time Signature` <- as.character(df3$`Time Signature`)
 df3 <- t(df3)
 
-# kable 
+# kable
 if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
   xxtb <- kable( df3, format='html', table.attr = "style='width:40% ;'"  )
   xxtb
@@ -395,14 +401,17 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   ###### "{ }\\" -- try to create some vertical space
   xcaption <- paste0("Summary of Time Signature Characteristics")
   colnames(df3) <- NULL
-  
-  xxMM <- kable(df3, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
 
-  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+  XX <- kable(df3, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  
+  # fix first line default indent
+  XX <- add_indent(XX, c(1), level_of_indent = -0.4, all_cols = FALSE)
+
+  kable_styling(XX, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 ```
 
-### Key Signature 
+### Key Signature
 
 Key signature describes the combination of sharps and flats that determine the scale of a piece of music. In general, most songs shift from key to key to add variance and intrigue, but this dataset estimates the overall key. As the table below indicates, the estimated key does not have a significant effect on the success rate of songs since the 'Percentage of Hit Tracks' varies around 40% for each key.
 
@@ -430,7 +439,7 @@ df4$song_key <- c("C", "C#/Db", "D", "D#/Eb", "E","F", "F#/Gb","G", "G#/Ab","A",
 
 colnames(df4) <- c("Key Signature", "Average Danceability", "Average Acousticness", "Average Energy", "Percentage of Hit Tracks")
 
-# kable 
+# kable
 if( opts_knit$get('rmarkdown.pandoc.to') %in% 'html' ) {
   xxtb <- kable( df4, format='html', table.attr = "style='width:40% ;'"  )
   xxtb
@@ -440,14 +449,17 @@ if( opts_knit$get("rmarkdown.pandoc.to") %in% "latex" ) {
   ###### "{ }\\" -- try to create some vertical space
   xcaption <- paste0("Summary of Key Signature Characteristics")
   rownames(df4) <- NULL
-  
-  xxMM <- kable(df4, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
 
-  kable_styling(xxMM, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
+  XX <- kable(df4, format="latex", caption = xcaption, booktabs = TRUE, longtable = TRUE)
+  
+  # fix first line default indent
+  XX <- add_indent(XX, c(1), level_of_indent = -0.3, all_cols = FALSE)
+
+  kable_styling(XX, latex_options= c("hold_position","striped"), latex_table_env="longtable", repeat_header_text = "\\textit{(continued)}", repeat_header_continued = TRUE, position = "center", font_size = 9)
 }
 ```
 
-## Danceability 
+## Danceability
 
 Through our analysis of the music theory features, we discovered the importance of danceability. This attribute is defined by Spotify as a way to describe how suitable a track is for dancing. This value is based on a combination of musical elements, including tempo, rhythm stability, beat strength, and overall regularity. A value close to 0 indicates a song is challenging to dance to; 1 represents dance-friendly songs. However, since we do not know the specifics of Spotify's algorithm, we will explore the correlation of this feature with other variables using the corrplot[5] package. 
 
@@ -458,7 +470,7 @@ Through our analysis of the music theory features, we discovered the importance 
 db<- "SELECT * FROM music;"
 data <- dbGetQuery(con, db)
 
-danceable <- data[,5:19] 
+danceable <- data[,5:19]
 danceable_cor <- cor(danceable)
 
 par(xpd=TRUE)
@@ -467,38 +479,41 @@ corrplot::corrplot(danceable_cor,
          order = 'hclust',
          type = 'lower',
          addCoef.col = 'black',
-         number.cex = .5,
+         number.cex = .7,
          tl.col = 'black',
          number.digits = 1.,
          mar = c(2, 0, 5, 0)
 )
 ```
 
-\vspace{4pt}
+In the above correlation plot, acousticness and instrumentalness are the most negatively correlated variables, both with a -0.3 correlation. To get a closer look at the relationship between danceability and these two variables, we will utilize the following jitter plots.
 
-As you can see in the correlation plot above, acousticness and instrumentalness are the most negatively correlated variables, both with a -0.3 correlation. To get a closer look at the relationship between danceability and these two variables, we will utilize the jitter plots below. 
-
-\vspace{6pt}
-
-```{r echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE , fig.height = 3, fig.width = 5, fig.align="center"}
+```{r echo=FALSE, message=FALSE, eval=TRUE, results='hide', warnings = FALSE , fig.height = 3.3, fig.width = 7, fig.align="center"}
 
 # Most negatively correlated with danceability
-c1 <- danceable %>% ggplot(aes(acousticness, danceability)) + geom_jitter(color = "red", alpha = 0.3) + geom_smooth(color = "black") + theme_minimal()
-c2 <- danceable %>% ggplot(aes(instrumentalness, danceability)) + geom_jitter(color = "orange", alpha = 0.3) + geom_smooth(color = "black") + theme_minimal()
+c1 <- danceable %>% ggplot(aes(acousticness, danceability)) + 
+  geom_jitter(color = "red", alpha = 0.3) + 
+  geom_smooth(color = "black") + 
+  theme(axis.title.x = element_text(size = 7.5),
+        axis.title.y = element_text(size = 7.5))+  
+  theme_minimal()
+c2 <- danceable %>% ggplot(aes(instrumentalness, danceability)) + geom_jitter(color = "orange", alpha = 0.3) + geom_smooth(color = "black") + 
+  theme(axis.title.x = element_text(size = 7.5),
+        axis.title.y = element_text(size = 7.5)) + theme_minimal()
 
 # Most positively correlated with danceabiity
-c3 <- danceable %>% ggplot(aes(loudness, danceability)) + geom_jitter(color = "blue", alpha = 0.3) + geom_smooth(color = 'black') + theme_minimal()
-c4 <- danceable %>% ggplot(aes(valence, danceability)) + geom_jitter(color = "purple", alpha = 0.3) + geom_smooth(color = 'black') + theme_minimal()
+c3 <- danceable %>% ggplot(aes(loudness, danceability)) + geom_jitter(color = "blue", alpha = 0.3) + geom_smooth(color = 'black')+ 
+  theme(axis.title.x = element_text(size = 7.5),
+        axis.title.y = element_text(size = 7.5)) + theme_minimal()
+c4 <- danceable %>% ggplot(aes(valence, danceability)) + geom_jitter(color = "purple", alpha = 0.3) + geom_smooth(color = 'black') + 
+  theme(axis.title.x = element_text(size = 7.5),
+        axis.title.y = element_text(size = 7.5)) + theme_minimal()
 
 ggpubr::ggarrange(c1, c2,c3,c4)
-
 ```
+The first plot shows that while acousticness is negatively correlated with danceability, having acoustics in a song is the better option when it comes to making a track danceable. In addition, the top right plot shows a consistent downward trend with instrumentalness, indicating songs with no vocals are harder for danceability. On the other hand, we found that loudness and valence are the most positively correlated variables with danceability. The bottom left plot indicates a threshold of “loudness” until a song becomes less danceable. The plot on the bottom right shows a steady positive correlation between valence and danceability which follows our intuition that tracks with high valence (positive sounds) would indicate a more danceable tune to listeners.
 
-\vspace{4pt}
-
-The first plot shows that while acousticness is negatively correlated with danceability, having acoustics in a song is the better option when it comes to making a track danceable. In addition, the top right plot shows a more consistent downward trend with instrumentalness, indicating songs with no vocals are harder for danceability. On the other hand, we found that loudness and valence are the most positively correlated variables when it comes to danceability. The bottom left plot indicates that there is a threshold of “loudness” that a song may have until it becomes less danceable. The plot on the bottom right shows that there is a steady positive correlation between valence and danceability which follows our intuition that tracks with high valence (more positive sounds) would indicate a more danceable tune to listeners.
-
-\newpage 
+\newpage
 
 ## Attributes of Hit Tracks by Decade
 
@@ -512,7 +527,7 @@ The duration of hit tracks is generally under 10 minutes, with an average closer
 
 ```{r echo=FALSE, eval=TRUE, results='hide', warning=FALSE, message = FALSE, fig.height = 3, fig.width = 6, fig.align="center"}
 query5 <- "
-SELECT 
+SELECT
   decade
   , danceability
   , liveness
@@ -526,15 +541,15 @@ WHERE
 "
 
 query6 <- "
-SELECT 
+SELECT
   decade
   , AVG(duration_ms / 60000) AS avg_duration -- Convert to minutes
   , STD(duration_ms / 60000) AS sd_duration
-FROM 
+FROM
   music
-WHERE 
+WHERE
   hit = '1'
-GROUP BY 
+GROUP BY
   decade
 
 ;
@@ -543,14 +558,14 @@ GROUP BY
 result5 <- dbGetQuery(con, query5)
 result6 <- dbGetQuery(con, query6)
 
-ggplot(data = result5, 
+ggplot(data = result5,
        aes(x = factor(decade, level = DECADE_ORDER), y = duration, color = decade)) +
   geom_point(position = position_jitter(w = 0.2)) +
   geom_errorbar(data = result6, mapping = aes(x = decade, y = avg_duration,
                   ymin = avg_duration - sd_duration,
                   ymax = avg_duration + sd_duration
                   ),
-                color = 'black', width = 0.2) + 
+                color = 'black', width = 0.2) +
   geom_point(data = result6, aes(x = decade, y = avg_duration), color = 'black') +
   xlab("Decade") +
   ylab("Duration (minutes)") +
@@ -559,7 +574,7 @@ ggplot(data = result5,
 
 ggsave("Duration_By_Decade.png", device = "png", path = "plots")
 ```
-          
+
 
 ### Proportion of Major/Minor Modes
 
@@ -569,8 +584,8 @@ The proportion of hit songs in the minor mode has increased from about 15% in th
 
 ```{r echo=FALSE, eval=TRUE, results='hide', warning=FALSE, message = FALSE, fig.height = 3, fig.width = 6, fig.align="center"}
 mode_query <- "
-SELECT 
-  CASE 
+SELECT
+  CASE
     WHEN decade = '60s\r' THEN '1960'
     WHEN decade = '70s\r' THEN '1970'
     WHEN decade = '80s\r' THEN '1980'
@@ -580,11 +595,11 @@ SELECT
     ELSE 'Unknown Decade'
   END
   , song_mode
-FROM 
+FROM
   music
 WHERE
   hit = '1'
-  
+
 ;
 "
 
@@ -598,14 +613,14 @@ mode_proportions_by_decade <- mode_result %>%
   mutate(mode_percent = n / sum(n) * 100)
 
 
-ggplot(data = mode_proportions_by_decade, 
+ggplot(data = mode_proportions_by_decade,
        aes(x = as.numeric(decade), y = mode_percent, fill = factor(song_mode))
        ) +
   geom_bar(stat = "identity") +
-  xlab("Decade") + 
+  xlab("Decade") +
   ylab("Percentage") +
   scale_fill_manual(name = "Mode", # Legend options
-                    labels = c("Minor", "Major"), 
+                    labels = c("Minor", "Major"),
                     values = c("#619CFF", "#F8766D"))+
   theme(plot.title = element_text(hjust = 0.5)) + theme_minimal()
 
@@ -642,8 +657,8 @@ avg_traits_by_decade <- overview_result %>%
   summarize_all("mean") %>%
   melt(id = "decade")
 
-ggplot(data = avg_traits_by_decade, 
-       aes(x = factor(decade, level = DECADE_ORDER), 
+ggplot(data = avg_traits_by_decade,
+       aes(x = factor(decade, level = DECADE_ORDER),
            y = value, color = variable)
        ) +
   geom_line(aes(group = variable), size = 1) +
@@ -651,7 +666,9 @@ ggplot(data = avg_traits_by_decade,
   xlab("Decade") +
   ylab("Value") +
   scale_y_continuous(limits = c(0, 1.0)) +
-  theme(legend.title = element_blank(), plot.title = element_text(hjust = 0.5)) +
+  theme(legend.title = element_blank(), plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10)) +
   theme_minimal()
 
 ggsave("Traits_By_Decade.png", device = "png", path = "plots")
@@ -661,9 +678,9 @@ ggsave("Traits_By_Decade.png", device = "png", path = "plots")
 
 The final portion of our analysis explores the behavior of the section variable. Each track is broken up into various sections to describe what musicians refer to as the intro, verses, pre-chorus, chorus, bridge, and outro of a song. Throughout our analysis, we have seen the effect of univariate variables on the popularity of songs and will continue with a bivariate approach using visuals to understand how music changes as the number of sections differ from track to track.
 
-### Most Common Number of Sections 
+### Most Common Number of Sections
 
-We begin by subsetting our data into hit tracks that were featured in at least one week of the 'Billboards Top 100' list in one of the six decades in our dataset. Overall, the most common number of sections of a song is nine: intro, verse 1, pre-chorus, chorus, verse 2, pre-chorus, chorus, bridge, outro. 
+We begin by subsetting our data into hit tracks that were featured in at least one week of the 'Billboards Top 100' list in one of the six decades in our dataset. Overall, the most common number of sections of a song is nine: intro, verse 1, pre-chorus, chorus, verse 2, pre-chorus, chorus, bridge, outro.
 
 \vspace{12pt}
 
@@ -677,7 +694,7 @@ getmode(hot_sections$sections)
 # Within hot tracks, tracks with 9 sections have the highest number
 ```
 
-The following line plot demonstrates the most commonly used number of sections per decade. The trend indicates that even though the overall mode is nine sections, we see an increase into the 1980s, which tend to spread their tracks into 11 sections. We then see a decrease in this variable in the 1990s, returning to the standard nine sections in the most recent years. This is likely due to the fact that many 80s songs are considered more experimental compared to the highly algorithmic way of producing songs by current music entertainers. 
+The following line plot demonstrates the most commonly used number of sections per decade. The trend indicates that even though the overall mode is nine sections, we see an increase into the 1980s, which tend to spread their tracks into 11 sections. We then see a decrease in this variable in the 1990s, returning to the standard nine sections in the most recent years. This is likely due to the fact that many 80s songs are considered more experimental compared to the highly algorithmic way of producing songs by current music entertainers.
 
 \newpage
 
@@ -704,14 +721,14 @@ most_sections_decades <- data.frame(most_sections_decades)
 colnames(most_sections_decades) <- c("Decades", "Most Common Sections")
 
 # most_sections_decades
-plot(1:length(most_section_de), most_section_de, type = "l", xlab = "Decades", ylab = "Number of Sections", xaxt = "n", yaxt = "n", main = "Most Common Number of Sections per Decade")
+plot(1:length(most_section_de), most_section_de, type = "l", xlab = "Decades", ylab = "Number of Sections", xaxt = "n", yaxt = "n", main = "Most Common Number of Sections per Decade", cex.axis = 0.7, cex.main = 0.9)
 axis(1, at=1:length(most_section_de), labels=c("60s", "70s", "80s", "90s", "00s", "10s"))
 axis(2, at = 7:12, labels=c("7","8","9","10","11","12"))
 ```
 
 ### Relationship with Energy and Danceability
 
-One interesting find in regards to sections is the relationship the variable has with the average energy and danceability, both of which are nearly quadratic across the range of sections. This can be interpreted to mean that songs with a reasonable amount of sections tend to have higher energy and head-bopping melodies. For example, let us compare a pop song to a piano sonata. A pop song generally has 9-10 sections, while sonatas have approximately 20 sections. If we imagine having to tell a story in 10 chapters versus 20, it is easy to believe the story with fewer chapters will be more cramped and full of drama. The same thing applies to songs; to successfully tell a story in half the space, a pop song would have to compensate with more dramatic sounds and lyrics, hence the higher levels of energy and danceability. 
+One interesting find in regards to sections is the relationship the variable has with the average energy and danceability, both of which are nearly quadratic across the range of sections. This can be interpreted to mean that songs with a reasonable amount of sections tend to have higher energy and head-bopping melodies. For example, let us compare a pop song to a piano sonata. A pop song generally has 9-10 sections, while sonatas have approximately 20 sections. If we imagine having to tell a story in 10 chapters versus 20, it is easy to believe the story with fewer chapters will be more cramped and full of drama. The same thing applies to songs; to successfully tell a story in half the space, a pop song would have to compensate with more dramatic sounds and lyrics, hence the higher levels of energy and danceability.
 ```{r, echo=FALSE, eval=TRUE, results='hide', warning = FALSE, fig.height = 3.5, fig.width =6, fig.align='center'}
 # section and energy
 qstr <- paste0("SELECT sections, AVG(energy) as average_energy FROM music GROUP BY sections ORDER BY sections")
@@ -767,11 +784,11 @@ dbDisconnect(con)
 
 # Conclusions
 
-From this overview of Spotify songs, we have obtained an idea of the evolution of musical tastes and songwriting trends over the last several decades. Using text mining, we discovered two important themes that span across all time: emotions and relationships. Regardless of societal evolution, expressing our emotions towards the people, we care for seems to be a constant force. We also explored various aspects of our tracks, such as key and time signature, danceability, energy, duration, and acousticness. Through this section of the analysis, we discovered that people tend to prefer sad, depressing songs more in recent years. This was verified by exploring the major/minor modes as well as the valence of songs across multiple decades. 
+From this overview of Spotify songs, we have obtained an idea of the evolution of musical tastes and songwriting trends over the last several decades. Using text mining, we discovered two important themes that span across all time: emotions and relationships. Regardless of societal evolution, expressing our emotions towards the people, we care for seems to be a constant force. We also explored various aspects of our tracks, such as key and time signature, danceability, energy, duration, and acousticness. Through this section of the analysis, we discovered that people tend to prefer sad, depressing songs more in recent years. This was verified by exploring the major/minor modes as well as the valence of songs across multiple decades.
 
 \vspace{10pt}
 
-A visual exploration of our section variables revealed that in the last 20 years, tracks have consistently maintained approximately nine sections. This steady approach to song structure highly suggests the introduction of a breakthrough algorithmic approach towards song creation in order to increase success potential. This ties in with our first table, which indicates that as time goes on, artists produce fewer songs per decade. The combination of these two results leads us to believe that with the expanding talent in the current entertainment industry, there has been a recent surge towards focusing on the quality of musical outputs in order to stand out. 
+A visual exploration of our section variables revealed that in the last 20 years, tracks have consistently maintained approximately nine sections. This steady approach to song structure highly suggests the introduction of a breakthrough algorithmic approach towards song creation in order to increase success potential. This ties in with our first table, which indicates that as time goes on, artists produce fewer songs per decade. The combination of these two results leads us to believe that with the expanding talent in the current entertainment industry, there has been a recent surge towards focusing on the quality of musical outputs in order to stand out.
 
 \vspace{10pt}
 
@@ -779,7 +796,7 @@ With more data and possibly the baseline of Spotify's musical attribute assignme
 
 \vspace{12pt}
 
-# Bibliography 
+# Bibliography
 
 1. FortyTwo102. "Spotify and Billboard Top Hits Data." GitHub. Jan. & Feb., 2020. Accessed May 27, 2021. https://github.com/fortyTwo102/The-Spotify-Hit-Predictor-Dataset.
 
